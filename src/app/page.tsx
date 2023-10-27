@@ -1,59 +1,11 @@
 "use client";
 
+import { useMemo, useState } from "react"
 import { Canvas, useFrame } from "@react-three/fiber"
-import { maxBy, sample, times } from "lodash";
-import { useEffect, useMemo, useRef, useState } from "react"
-import { Edges } from "@react-three/drei";
-import { SHAPES } from "./constants";
 import { useKey } from "rooks";
-
-const PLAYGROUND_SIZE = 12;
-const PLAYGROUND_HEIGHT = 16;
-const BLOCK_SIZE = 0.2;
-const GRID_SIZE = PLAYGROUND_SIZE * BLOCK_SIZE;
-const BORDERS = {
-  x: [-((PLAYGROUND_SIZE / 2) - 1), PLAYGROUND_SIZE / 2],
-  z: [0, (PLAYGROUND_SIZE - 1)]
-}
-
-interface Pos {
-  x: number;
-  y: number;
-  z: number;
-}
-
-const Shape = ({ blocks, pos }: { blocks: Pos[], pos: Pos }) => {
-  return blocks.map((block, i) => {
-    const x = (pos.x * BLOCK_SIZE) + (block.x * BLOCK_SIZE);
-    const z = (pos.z * BLOCK_SIZE) + (block.z * BLOCK_SIZE);
-    const y = (pos.y * BLOCK_SIZE) + (block.y * BLOCK_SIZE);
-
-    return (
-      <Block key={`block-${i}`} position={[x, y, z]} color={'#8E8FFA'} />
-    )
-  })
-}
-
-const Block = ({ color, ...props }: any) => {
-  const ref = useRef({ rotation: { x: 0, y: 0 } })
-  const [hovered, hover] = useState(false)
-  const [clicked, click] = useState(false)
-
-  return (
-    <mesh
-      {...props}
-      ref={ref}
-      scale={0.95}
-      onClick={(event) => click(!clicked)}
-      onPointerOver={(event) => hover(true)}
-      onPointerOut={(event) => hover(false)}
-    >
-      <boxGeometry args={[BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE]}  />
-      <Edges />
-      <meshStandardMaterial transparent={true} opacity={0.8} color={color} />
-    </mesh>
-  )
-}
+import { maxBy, sample, times } from "lodash";
+import { Block, Shape } from "@/components";
+import { BLOCK_SIZE, BORDERS, GRID_SIZE, PLAYGROUND_HEIGHT, PLAYGROUND_SIZE, SHAPES } from "@/constants";
 
 export default function Playground() {
   const [pos, setPos] = useState({ x: 0, z: 0, y: PLAYGROUND_HEIGHT / 2 });
