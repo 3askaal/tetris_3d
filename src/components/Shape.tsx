@@ -1,4 +1,5 @@
 import { BLOCK_SIZE } from "@/constants";
+import { Pos } from "@/types";
 import { Block } from ".";
 
 export const Shape = ({ blocks, pos }: { blocks: Pos[], pos: Pos }) => {
