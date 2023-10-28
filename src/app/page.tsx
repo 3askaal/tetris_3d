@@ -1,15 +1,20 @@
 "use client";
 
-import { useMemo, useState } from "react"
+import { useEffect, useMemo, useState } from "react"
 import { Canvas, useFrame } from "@react-three/fiber"
-import { useKey } from "rooks";
+import { useIntervalWhen, useKey } from "rooks";
 import { maxBy, sample, times } from "lodash";
 import { Block, Shape } from "@/components";
-import { BLOCK_SIZE, BORDERS, GRID_SIZE, PLAYGROUND_HEIGHT, PLAYGROUND_SIZE, SHAPES } from "@/constants";
+import { PLAYGROUND_HEIGHT, PLAYGROUND_SIZE, SHAPES } from "@/constants";
+import { checkPos } from "@/helpers/shape";
+import { IBlock } from "@/types";
+
+const initialPos = { x: 0, z: 0, y: 0 };
 
 export default function Playground() {
-  const [pos, setPos] = useState({ x: 0, z: 0, y: PLAYGROUND_HEIGHT / 2 });
-  const shapeBlocks = useMemo(() => sample(SHAPES) || [], []);
+  const [pos, setPos] = useState(initialPos);
+  const [blocks, setBlocks] = useState<IBlock[]>([]);
+  const shapeBlocks = useMemo(() => sample(SHAPES) || [], [blocks.length]);
   const shapeSize = useMemo(() => ({
     x: (maxBy(shapeBlocks, 'x')?.x || 0),
     z: (maxBy(shapeBlocks, 'z')?.z || 0),
@@ -22,20 +27,32 @@ export default function Playground() {
   useKey(['ArrowRight'], () => changePos('x', 1))
   useKey(['Space'], () => changePos('y', -1))
 
+  useIntervalWhen(() => {
+    changePos('y', -1);
+  }, 1000)
+
   const changePos = (axis: 'x' | 'z' | 'y', direction: -1 | 1) => {
     const newPos = { ...pos, [axis]: pos[axis] + direction };
 
-    if (axis === 'x' || axis === 'z') {
-      if (newPos[axis] < BORDERS[axis][0]) {
-        return;
-      }
+    const { hitsBlock, hitsSide, hitsBottom } = checkPos({ pos: newPos, size: shapeSize, blocks: shapeBlocks }, blocks, { width: PLAYGROUND_SIZE, height: PLAYGROUND_HEIGHT });
 
-      if (newPos[axis] + shapeSize[axis] > BORDERS[axis][1]) {
-        return;
-      }
+    if (hitsSide) {
+      return;
     }
 
-    if (axis === 'y' && newPos[axis] < -((PLAYGROUND_HEIGHT / 2) - 1)) {
+    if (hitsBlock || hitsBottom) {
+      const newBlocks = [
+        ...blocks,
+        ...shapeBlocks.map((block) => ({
+          x: block.x + pos.x,
+          y: block.y + pos.y,
+          z: block.z + pos.z,
+        }))
+      ];
+
+      setBlocks(newBlocks);
+      setPos(initialPos);
+
       return;
     }
 
@@ -47,16 +64,20 @@ export default function Playground() {
       <ambientLight />
       <pointLight position={[10, 10, 10]} />
 
-      <group rotation={[0, 0, 0]}>
+      <group rotation={[0, 0, 0]} position={[-0.75, 2, 0]} scale={0.2}>
         <Shape blocks={shapeBlocks} pos={pos} />
 
+        { blocks?.map((block, i) => (
+          <Block key={`block-${i}`} position={[block.x, block.y, block.z]} color={'#ffffff'} />
+        )) }
+
         { times(PLAYGROUND_SIZE * PLAYGROUND_SIZE, (i) => {
-          const x = (((i % PLAYGROUND_SIZE) + 1) * BLOCK_SIZE) - (GRID_SIZE / 2);
-          const z = Math.floor(i / PLAYGROUND_SIZE) * BLOCK_SIZE;
-          const y = -(BLOCK_SIZE * (PLAYGROUND_HEIGHT / 2));
+          const x = i % PLAYGROUND_SIZE;
+          const z = Math.floor(i / PLAYGROUND_SIZE);
+          const y = -(PLAYGROUND_HEIGHT + 1);
 
           return (
-            <Block key={`block-${i}`} position={[x, y, z]} color={'#ffffff'} />
+            <Block key={`bottom-${i}`} position={[x, y, z]} color={'#ffffff'} />
           )
         }) }
       </group>
