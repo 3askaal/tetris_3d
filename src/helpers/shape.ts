@@ -11,7 +11,7 @@ export const checkPos = (nextShape: IShape, currentBlocks: IBlock[], dimensions:
 
   const hitsSideX = (nextShape.pos.x < 0) || (nextShape.pos.x + nextShape.size.x > dimensions.width);
   const hitsSideZ = (nextShape.pos.z < 0) || (nextShape.pos.z + nextShape.size.z > dimensions.width);
-  const hitsBottom = (nextShape.pos.y + nextShape.size.y) <= -dimensions.height;
+  const hitsBottom = nextShape.pos.y === 0;
 
   return {
     hitsBlock,
