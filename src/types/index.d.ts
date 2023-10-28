@@ -8,7 +8,7 @@ export interface IBlock {
   x: number;
   y: number;
   z: number;
-  color: string;
+  color?: string;
 }
 
 export interface IShape {
