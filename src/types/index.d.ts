@@ -8,6 +8,7 @@ export interface IBlock {
   x: number;
   y: number;
   z: number;
+  color: string;
 }
 
 export interface IShape {
