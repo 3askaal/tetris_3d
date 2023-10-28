@@ -22,5 +22,6 @@ export interface IShape {
     y: number;
     z: number;
   };
-  blocks: Block[];
+  blocks: IBlock[];
+  color: string;
 }
