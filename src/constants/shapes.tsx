@@ -58,11 +58,4 @@ export const SHAPES = [
     { x: 1, y: 1, z: 0 },
     { x: 0, y: 0, z: 1 },
   ],
-]
-
-// [
-//   { x: 0, y: 0, z: 0, color: 'red' },
-//   { x: 0, y: 1, z: 0, color: 'yellow' },
-//   { x: 1, y: 1, z: 0, color: 'green' },
-//   { x: 0, y: 0, z: 1, color: 'blue' },
-// ]
+];

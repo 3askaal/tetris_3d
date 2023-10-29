@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState } from "react"
 import { Canvas, useFrame } from "@react-three/fiber"
 import { useIntervalWhen, useKey, useKeys } from "rooks";
-import { maxBy, sample, times } from "lodash";
+import { findIndex, isEqual, last, max, maxBy, pull, sample, sortBy, times } from "lodash";
 import randomColor from 'randomcolor';
 import { Block, Plane, Shape } from "@/components";
 import { PLAYGROUND_HEIGHT, PLAYGROUND_SIZE, SHAPES } from "@/constants";
@@ -31,19 +31,34 @@ export default function Playground() {
   const [blocks, setBlocks] = useState<IBlock[]>([]);
   const [shape, setShape] = useState<IShape>(initialShape());
 
-  useKey('ArrowUp', () => changePos('z', -1))
-  useKey('ArrowDown', () => changePos('z', 1))
-  useKey('ArrowLeft', () => changePos('x', -1))
-  useKey('ArrowRight', () => changePos('x', 1))
-  useKey('Space', () => changePos('y', -1))
+  useKey('ArrowUp', (params) => {
+    if (params.shiftKey) rotateShape('x', 'cw');
+    else if (params.altKey) setCameraAngle(cameraAngle + 1);
+    else changePos('z', -1);
+  })
 
-  // useKeys(['Shift', 'ArrowLeft'], () => setCameraAngle(cameraAngle - 1))
-  // useKeys(['Shift', 'ArrowRight'], () => setCameraAngle(cameraAngle + 1))
+  useKey('ArrowDown', (params) => {
+    if (params.shiftKey) rotateShape('x', 'ccw');
+    else if (params.altKey) setCameraAngle(cameraAngle + 1);
+    else changePos('z', 1);
+  })
 
-  useKeys(['Shift', 'ArrowLeft'], () => rotateShape('x', -1))
-  useKeys(['Shift', 'ArrowRight'], () => rotateShape('x', 1))
-  useKeys(['Shift', 'ArrowUp'], () => rotateShape('y', 1))
-  useKeys(['Shift', 'ArrowDown'], () => rotateShape('y', -1))
+  useKey('ArrowLeft', (params) => {
+    if (params.shiftKey) rotateShape('z', 'ccw');
+    else if (params.altKey) setCameraAngle(cameraAngle + 1);
+    else changePos('x', -1);
+  })
+
+  useKey('ArrowRight', (params) => {
+    if (params.shiftKey) rotateShape('z', 'cw');
+    else if (params.altKey) setCameraAngle(cameraAngle + 1);
+    else changePos('x', 1);
+  })
+
+  useKey('Space', (params) => {
+    if (params.shiftKey) return;
+    changePos('y', -1);
+  })
 
   useIntervalWhen(() => {
     changePos('y', -1);
@@ -84,30 +99,57 @@ export default function Playground() {
     setShape(newShape);
   }
 
-  const rotateShape = (axis: 'x' | 'y', direction: -1 | 1) => {
+  const rotateShape = (axis: 'z' | 'x', direction: 'cw' | 'ccw') => {
     let newShape = { ...shape };
 
-    newShape.blocks = newShape.blocks.map((block) => {
-      const xBorder = newShape.size.x - 1
-      const zBorder = newShape.size.z - 1
-      const yBorder = newShape.size.y - 1
+    const dirAxises = pull(['x', 'y', 'z'], axis) as ['x' | 'y'] | ['z' | 'y'];
 
-      const newX = direction === 1 ? (block.x + 1 > xBorder) ? 0 : (block.x + 1) : block.x - 1 < 0 ? xBorder : block.x - 1;
-      const newZ = direction === 1 ? (block.z + 1 > zBorder) ? 0 : (block.z + 1) : block.z - 1 < 0 ? zBorder : block.z - 1;
-      const newY = direction === 1 ? (block.y + 1 > yBorder) ? 0 : (block.y + 1) : block.y - 1 < 0 ? yBorder : block.y - 1;
+    const maxSize = (max(dirAxises.map((key) => shape.size[key])) as number) - 1;
+
+    const oppositeAxis = axis === 'z' ? 'x' : 'z';
+
+    const orders = {
+      cw: [[oppositeAxis, 0], ['y', maxSize], [oppositeAxis, maxSize], ['y', 0]],
+      ccw: [['y', 0], [oppositeAxis, maxSize], ['y', maxSize], [oppositeAxis, 0]],
+    };
+
+    const axisChecks = dirAxises.map((dirAxis) => {
+      return [[dirAxis, 0], [dirAxis, maxSize]];
+    }).flat() as ['x' | 'y' | 'z', number][];
+
+    newShape.blocks = newShape.blocks.map((block) => {
+      const axisCheckMatches = axisChecks
+        .filter((axisCheck) => {
+          return block[axisCheck[0]] === axisCheck[1]
+        });
+
+      // TODO: figure out why this works
+      if (axis === 'z' && direction === 'ccw' || axis === 'x' && direction === 'cw') {
+        axisCheckMatches.reverse();
+      }
+
+      block = [axisCheckMatches[0]].reduce((acc, axisCheckMatch) => {
+        const currentSideIndex = findIndex(orders[direction], (value) => isEqual(value, axisCheckMatch));
+        const currentSide = orders[direction][currentSideIndex];
+        const nextSide = orders[direction][currentSideIndex + 1] || orders[direction][0];
+
+        return {
+          ...acc,
+          [nextSide[0]]: nextSide[1],
+          [currentSide[0]]: acc[nextSide[0]]
+        }
+      }, { ...block } as any)
 
       return {
         ...block,
-        ...(axis === 'x' && {
-          x: newX,
-          z: newZ,
-        }),
-        ...(axis === 'y' && {
-          y: newY,
-          z: newZ,
-        }),
       }
     })
+
+    shape.size = {
+      x: (maxBy(shape.blocks, 'x')?.x || 0) + 1,
+      z: (maxBy(shape.blocks, 'z')?.z || 0) + 1,
+      y: (maxBy(shape.blocks, 'y')?.y || 0) + 1,
+    }
 
     setShape(newShape)
   }
@@ -119,7 +161,7 @@ export default function Playground() {
 
       <group
         // rotation={[0, -.33, 0]}
-        rotation={[0, (Math.PI / 2) * cameraAngle, 0]}
+        rotation={[0, (Math.PI / 4) * cameraAngle, 0]}
         position={[-0.75, -1.5, 0]}
         scale={0.2}
       >
