@@ -11,11 +11,13 @@ import { checkPos } from "@/helpers/shape";
 import { IBlock, IShape } from "@/types";
 
 const initialShape = () => {
-  const shapeBlocks = sample(SHAPES) || [];
+  const shapeType: { x: IBlock[][] } = sample(SHAPES)!;
+  const shapeBlocks = shapeType.x[0]
 
   return {
     pos: { x: 0, z: 0, y: PLAYGROUND_HEIGHT },
     blocks: shapeBlocks,
+    rotations: shapeType,
     size: {
       x: (maxBy(shapeBlocks, 'x')?.x || 0) + 1,
       z: (maxBy(shapeBlocks, 'z')?.z || 0) + 1,
@@ -87,27 +89,7 @@ export default function Playground() {
   const rotateShape = (axis: 'x' | 'y', direction: -1 | 1) => {
     let newShape = { ...shape };
 
-    newShape.blocks = newShape.blocks.map((block) => {
-      const xBorder = newShape.size.x - 1
-      const zBorder = newShape.size.z - 1
-      const yBorder = newShape.size.y - 1
-
-      const newX = direction === 1 ? (block.x + 1 > xBorder) ? 0 : (block.x + 1) : block.x - 1 < 0 ? xBorder : block.x - 1;
-      const newZ = direction === 1 ? (block.z + 1 > zBorder) ? 0 : (block.z + 1) : block.z - 1 < 0 ? zBorder : block.z - 1;
-      const newY = direction === 1 ? (block.y + 1 > yBorder) ? 0 : (block.y + 1) : block.y - 1 < 0 ? yBorder : block.y - 1;
-
-      return {
-        ...block,
-        ...(axis === 'x' && {
-          x: newX,
-          z: newZ,
-        }),
-        ...(axis === 'y' && {
-          y: newY,
-          z: newZ,
-        }),
-      }
-    })
+    // newShape.blocks =
 
     setShape(newShape)
   }
