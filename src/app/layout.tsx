@@ -1,9 +1,13 @@
+"use client";
+
 import type { Metadata } from 'next'
 import ReactGA from 'react-ga4'
+import { ThemeProvider, theme as DEFAULT_THEME } from '3oilerplate'
 import { Inter } from 'next/font/google'
 import './globals.css';
 
 import 'reset-css/reset.css'
+import dynamic from 'next/dynamic';
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -11,9 +15,13 @@ ReactGA.initialize('G-NF6H1LMC3H', {
   testMode: process.env.NODE_ENV === 'development'
 })
 
-export const metadata: Metadata = {
-  title: 'Tetris 3D'
-}
+const NonSSRWrapper = ({ children }: any) => (
+  <>{children}</>
+)
+
+const DynamicWrapper = dynamic(() => Promise.resolve(NonSSRWrapper), {
+  ssr: false
+})
 
 export default function RootLayout({
   children,
@@ -23,7 +31,11 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={inter.className}>
-        {children}
+        <ThemeProvider theme={DEFAULT_THEME}>
+          <DynamicWrapper>
+            {children}
+          </DynamicWrapper>
+        </ThemeProvider>
       </body>
     </html>
   )

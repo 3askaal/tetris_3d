@@ -10,7 +10,7 @@ export const Plane = ({ color, ...props }: any) => {
     <mesh
       {...props}
       ref={ref}
-      scale={0.90}
+      scale={0.9}
       onClick={(event) => click(!clicked)}
       onPointerOver={(event) => hover(true)}
       onPointerOut={(event) => hover(false)}

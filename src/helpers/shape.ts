@@ -1,6 +1,6 @@
 import { findIndex, isEqual, max, maxBy, minBy, pull, sample } from "lodash";
 import randomColor from "randomcolor";
-import { PLAYGROUND_HEIGHT, PLAYGROUND_SIZE, SHAPES } from "@/constants";
+import { PLAYGROUND_SIZE, PLAYGROUND_HEIGHT, SHAPES } from "@/constants";
 import { IBlock, IShape } from "@/types";
 
 export const getInitialShape = () => {
