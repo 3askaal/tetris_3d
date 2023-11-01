@@ -4,7 +4,7 @@ import { useState } from "react"
 import { Canvas, useThree } from "@react-three/fiber"
 import { useIntervalWhen, useKey } from "rooks";
 import { Box, Row, Col, Button } from "3oilerplate";
-import { RotateCcw, RotateCw, ChevronLeft, ChevronRight, ChevronUp, ChevronDown } from "react-feather";
+import { ChevronLeft, ChevronRight, ChevronUp, ChevronDown, ArrowLeft, ArrowUp, ArrowRight, ArrowDown } from "react-feather";
 import { times } from "lodash";
 import { Block, Shape } from "@/components";
 import { PLAYGROUND_SIZE } from "@/constants";
@@ -68,30 +68,30 @@ const Page = () => {
       <Canvas>
         <Playground shape={shape} blocks={blocks} />
       </Canvas>
-      <Box posa w100p s={{ bottom: 0 }}>
+      <Box posa w100p s={{ bottom: 0, overflow: 'hidden' }}>
         <Row>
           <Col s={{ justifyContent: 'flex-start' }}>
             <Box df w100p jcc s={{ flexGrow: 1 }}>
-              <Button s={{ px: 'xs', py: 'xxs' }} isOutline onClick={() => onRotateShape('x', 'ccw')}><RotateCcw /></Button>
+              <Button vertical isOutline onClick={() => onRotateShape('x', 'ccw')}><ArrowUp /></Button>
             </Box>
             <Box df w100p jcc s={{ flexGrow: 1 }}>
-              <Button s={{ px: 'xs', py: 'xxs' }} isOutline onClick={() => onRotateShape('z', 'ccw')}><RotateCcw /></Button>
-              <Button s={{ px: 'xs', py: 'xxs' }} isOutline onClick={() => onRotateShape('z', 'cw')}><RotateCw /></Button>
+              <Button horizontal isOutline onClick={() => onRotateShape('z', 'ccw')}><ArrowLeft /></Button>
+              <Button horizontal isOutline onClick={() => onRotateShape('z', 'cw')}><ArrowRight /></Button>
             </Box>
             <Box df w100p jcc s={{ flexGrow: 1 }}>
-              <Button s={{ px: 'xs', py: 'xxs' }} isOutline onClick={() => onRotateShape('x', 'cw')}><RotateCw /></Button>
+              <Button vertical isOutline onClick={() => onRotateShape('x', 'cw')}><ArrowDown /></Button>
             </Box>
           </Col>
           <Col>
             <Box df w100p jcc s={{ flexGrow: 1 }}>
-              <Button s={{ px: 'xs', py: 'xxs' }} isOutline onClick={() => onRepositionShape('z', -1)}><ChevronUp /></Button>
+              <Button vertical isOutline onClick={() => onRepositionShape('z', -1)}><ChevronUp /></Button>
             </Box>
             <Box df w100p jcc s={{ flexGrow: 1 }}>
-              <Button s={{ px: 'xs', py: 'xxs' }} isOutline onClick={() => onRepositionShape('x', -1)}><ChevronLeft /></Button>
-              <Button s={{ px: 'xs', py: 'xxs' }} isOutline onClick={() => onRepositionShape('x', 1)}><ChevronRight /></Button>
+              <Button horizontal isOutline onClick={() => onRepositionShape('x', -1)}><ChevronLeft /></Button>
+              <Button horizontal isOutline onClick={() => onRepositionShape('x', 1)}><ChevronRight /></Button>
             </Box>
             <Box df w100p jcc s={{ flexGrow: 1 }}>
-              <Button s={{ px: 'xs', py: 'xxs' }} isOutline onClick={() => onRepositionShape('z', 1)}><ChevronDown /></Button>
+              <Button vertical isOutline onClick={() => onRepositionShape('z', 1)}><ChevronDown /></Button>
             </Box>
           </Col>
         </Row>
@@ -130,8 +130,8 @@ const Playground = ({ shape, blocks = [] }: { shape: IShape, blocks: IBlock[] })
 
         <OrbitControls
           camera={camera}
-          minDistance={3}
-          maxDistance={20}
+          minDistance={4.5}
+          maxDistance={4.5}
           enableRotate={true}
           rotation={[Math.PI / 5, Math.PI / 5, Math.PI / 5]}
           target={[0, 0, 0.7]}
