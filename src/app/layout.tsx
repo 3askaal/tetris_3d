@@ -9,7 +9,7 @@ import 'normalize.css/normalize.css'
 const inter = Inter({ subsets: ['latin'] })
 
 ReactGA.initialize('G-NF6H1LMC3H', {
-  testMode: process.env.NODE_ENV !== 'production'
+  testMode: process.env.NODE_ENV === 'development'
 })
 
 export const metadata: Metadata = {

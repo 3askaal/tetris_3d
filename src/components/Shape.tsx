@@ -12,10 +12,16 @@ export const Shape = ({ blocks, pos, color, size }: IShape) => {
     )
   })
 
+  const onPointerMove = (event: any) => {
+    console.log('distance: ', event.distance);
+  }
+
   return (
     <>
+      <mesh onPointerMove={onPointerMove}>
+        <Blocks />
+      </mesh>
       {/* <Block position={[pos.x, pos.y, pos.z]} size={[size.x, size.x, size.x]} color={'white'} /> */}
-      <Blocks />
     </>
   )
 }
