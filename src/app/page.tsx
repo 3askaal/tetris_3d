@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState } from "react"
 import { Canvas, useFrame } from "@react-three/fiber"
 import { useIntervalWhen, useKey, useKeys } from "rooks";
-import { findIndex, isEqual, last, max, maxBy, pull, sample, sortBy, times } from "lodash";
+import { findIndex, isEqual, last, max, maxBy, minBy, pull, sample, sortBy, times } from "lodash";
 import randomColor from 'randomcolor';
 import { Block, Plane, Shape } from "@/components";
 import { PLAYGROUND_HEIGHT, PLAYGROUND_SIZE, SHAPES } from "@/constants";
@@ -139,17 +139,26 @@ export default function Playground() {
         }
       }, { ...block } as any)
 
-      // TODO: fix empty space in shape after repositioning of blocks
-
-      return {
-        ...block,
-      }
+      return block;
     })
 
-    shape.size = {
-      x: (maxBy(shape.blocks, 'x')?.x || 0) + 1,
-      z: (maxBy(shape.blocks, 'z')?.z || 0) + 1,
-      y: (maxBy(shape.blocks, 'y')?.y || 0) + 1,
+    const negativeSpace = {
+      x: (minBy(newShape.blocks, 'x')?.x || 0),
+      y: (minBy(newShape.blocks, 'y')?.y || 0),
+      z: (minBy(newShape.blocks, 'z')?.z || 0),
+    }
+
+    newShape.blocks = newShape.blocks.map((block) => ({
+      ...block,
+      x: negativeSpace.x < 0 ? block.x + Math.abs(negativeSpace.x) : block.x - Math.abs(negativeSpace.x),
+      y: negativeSpace.y < 0 ? block.y + Math.abs(negativeSpace.y) : block.y - Math.abs(negativeSpace.y),
+      z: negativeSpace.z < 0 ? block.z + Math.abs(negativeSpace.z) : block.z - Math.abs(negativeSpace.z),
+    }))
+
+    newShape.size = {
+      x: (maxBy(newShape.blocks, 'x')?.x || 0) + 1,
+      y: (maxBy(newShape.blocks, 'y')?.y || 0) + 1,
+      z: (maxBy(newShape.blocks, 'z')?.z || 0) + 1,
     }
 
     setShape(newShape)
@@ -159,9 +168,7 @@ export default function Playground() {
     <Canvas>
       <ambientLight />
       <pointLight position={[10, 10, 10]} />
-
       <group
-        // rotation={[0, -.33, 0]}
         rotation={[0, (Math.PI / 4) * cameraAngle, 0]}
         position={[-0.75, -1.5, 0]}
         scale={0.2}
