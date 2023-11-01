@@ -26,7 +26,6 @@ const initialShape = () => {
 }
 
 export default function Playground() {
-  // const [pos, setPos] = useState();
   const [cameraAngle, setCameraAngle] = useState<number>(0);
   const [blocks, setBlocks] = useState<IBlock[]>([]);
   const [shape, setShape] = useState<IShape>(initialShape());
@@ -139,6 +138,8 @@ export default function Playground() {
           [currentSide[0]]: acc[nextSide[0]]
         }
       }, { ...block } as any)
+
+      // TODO: fix empty space in shape after repositioning of blocks
 
       return {
         ...block,
