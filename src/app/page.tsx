@@ -7,161 +7,61 @@ import { findIndex, isEqual, last, max, maxBy, minBy, pull, sample, sortBy, time
 import randomColor from 'randomcolor';
 import { Block, Plane, Shape } from "@/components";
 import { PLAYGROUND_HEIGHT, PLAYGROUND_SIZE, SHAPES } from "@/constants";
-import { checkPos } from "@/helpers/shape";
+import { checkPos, getInitialShape, repositionShape, rotateShape } from "@/helpers/shape";
 import { IBlock, IShape } from "@/types";
 
-const initialShape = () => {
-  const shapeBlocks = sample(SHAPES) || [];
 
-  return {
-    pos: { x: 0, z: 0, y: PLAYGROUND_HEIGHT },
-    blocks: shapeBlocks,
-    size: {
-      x: (maxBy(shapeBlocks, 'x')?.x || 0) + 1,
-      z: (maxBy(shapeBlocks, 'z')?.z || 0) + 1,
-      y: (maxBy(shapeBlocks, 'y')?.y || 0) + 1,
-    },
-    color: randomColor({ luminosity: 'light' }),
-  }
-}
 
 export default function Playground() {
   const [cameraAngle, setCameraAngle] = useState<number>(0);
   const [blocks, setBlocks] = useState<IBlock[]>([]);
-  const [shape, setShape] = useState<IShape>(initialShape());
+  const [shape, setShape] = useState<IShape>(getInitialShape());
 
   useKey('ArrowUp', (params) => {
-    if (params.shiftKey) rotateShape('x', 'cw');
+    if (params.shiftKey) onRotateShape('x', 'cw');
     else if (params.altKey) setCameraAngle(cameraAngle + 1);
-    else changePos('z', -1);
+    else onRepositionShape('z', -1);
   })
 
   useKey('ArrowDown', (params) => {
-    if (params.shiftKey) rotateShape('x', 'ccw');
+    if (params.shiftKey) onRotateShape('x', 'ccw');
     else if (params.altKey) setCameraAngle(cameraAngle + 1);
-    else changePos('z', 1);
+    else onRepositionShape('z', 1);
   })
 
   useKey('ArrowLeft', (params) => {
-    if (params.shiftKey) rotateShape('z', 'ccw');
+    if (params.shiftKey) onRotateShape('z', 'ccw');
     else if (params.altKey) setCameraAngle(cameraAngle + 1);
-    else changePos('x', -1);
+    else onRepositionShape('x', -1);
   })
 
   useKey('ArrowRight', (params) => {
-    if (params.shiftKey) rotateShape('z', 'cw');
+    if (params.shiftKey) onRotateShape('z', 'cw');
     else if (params.altKey) setCameraAngle(cameraAngle + 1);
-    else changePos('x', 1);
+    else onRepositionShape('x', 1);
   })
 
   useKey('Space', (params) => {
     if (params.shiftKey) return;
-    changePos('y', -1);
+    onRepositionShape('y', -1);
   })
 
   useIntervalWhen(() => {
-    changePos('y', -1);
+    onRepositionShape('y', -1);
   }, 1000)
 
-  const changePos = (axis: 'x' | 'z' | 'y', direction: -1 | 1) => {
-    const newShape = {
-      ...shape,
-      pos: {
-        ...shape.pos,
-        [axis]: shape.pos[axis] + direction
-      }
-    }
+  const onRepositionShape = (axis: 'x' | 'z' | 'y', direction: -1 | 1) => {
+    const positionData = repositionShape(shape, blocks, axis, direction);
+    if (!positionData) return;
 
-    const { hitsBlock, hitsSide, hitsBottom } = checkPos(newShape, blocks, { width: PLAYGROUND_SIZE, height: PLAYGROUND_HEIGHT });
-
-    if (hitsSide) {
-      return;
-    }
-
-    if (hitsBlock || hitsBottom) {
-      const newBlocks = [
-        ...blocks,
-        ...shape.blocks.map((block) => ({
-          x: block.x + shape.pos.x,
-          y: block.y + shape.pos.y,
-          z: block.z + shape.pos.z,
-          color: shape.color
-        }))
-      ];
-
-      setBlocks(newBlocks);
-      setShape(initialShape());
-
-      return;
-    }
-
-    setShape(newShape);
+    setShape(positionData.shape);
+    setBlocks(positionData.blocks);
   }
 
-  const rotateShape = (axis: 'z' | 'x', direction: 'cw' | 'ccw') => {
-    let newShape = { ...shape };
+  const onRotateShape = (axis: 'z' | 'x', direction: 'cw' | 'ccw') => {
+    const newShape = rotateShape(shape, axis, direction);
 
-    const dirAxises = pull(['x', 'y', 'z'], axis) as ['x' | 'y'] | ['z' | 'y'];
-
-    const maxSize = (max(dirAxises.map((key) => shape.size[key])) as number) - 1;
-
-    const oppositeAxis = axis === 'z' ? 'x' : 'z';
-
-    const orders = {
-      cw: [[oppositeAxis, 0], ['y', maxSize], [oppositeAxis, maxSize], ['y', 0]],
-      ccw: [['y', 0], [oppositeAxis, maxSize], ['y', maxSize], [oppositeAxis, 0]],
-    };
-
-    const axisChecks = dirAxises.map((dirAxis) => {
-      return [[dirAxis, 0], [dirAxis, maxSize]];
-    }).flat() as ['x' | 'y' | 'z', number][];
-
-    newShape.blocks = newShape.blocks.map((block) => {
-      const axisCheckMatches = axisChecks
-        .filter((axisCheck) => {
-          return block[axisCheck[0]] === axisCheck[1]
-        });
-
-      // TODO: figure out why this works
-      if (axis === 'z' && direction === 'ccw' || axis === 'x' && direction === 'cw') {
-        axisCheckMatches.reverse();
-      }
-
-      block = [axisCheckMatches[0]].reduce((acc, axisCheckMatch) => {
-        const currentSideIndex = findIndex(orders[direction], (value) => isEqual(value, axisCheckMatch));
-        const currentSide = orders[direction][currentSideIndex];
-        const nextSide = orders[direction][currentSideIndex + 1] || orders[direction][0];
-
-        return {
-          ...acc,
-          [nextSide[0]]: nextSide[1],
-          [currentSide[0]]: acc[nextSide[0]]
-        }
-      }, { ...block } as any)
-
-      return block;
-    })
-
-    const negativeSpace = {
-      x: (minBy(newShape.blocks, 'x')?.x || 0),
-      y: (minBy(newShape.blocks, 'y')?.y || 0),
-      z: (minBy(newShape.blocks, 'z')?.z || 0),
-    }
-
-    newShape.blocks = newShape.blocks.map((block) => ({
-      ...block,
-      x: negativeSpace.x < 0 ? block.x + Math.abs(negativeSpace.x) : block.x - Math.abs(negativeSpace.x),
-      y: negativeSpace.y < 0 ? block.y + Math.abs(negativeSpace.y) : block.y - Math.abs(negativeSpace.y),
-      z: negativeSpace.z < 0 ? block.z + Math.abs(negativeSpace.z) : block.z - Math.abs(negativeSpace.z),
-    }))
-
-    newShape.size = {
-      x: (maxBy(newShape.blocks, 'x')?.x || 0) + 1,
-      y: (maxBy(newShape.blocks, 'y')?.y || 0) + 1,
-      z: (maxBy(newShape.blocks, 'z')?.z || 0) + 1,
-    }
-
-    setShape(newShape)
+    setShape(newShape);
   }
 
   return (
