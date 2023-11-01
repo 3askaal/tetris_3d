@@ -1,13 +1,12 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react"
-import { Canvas, useFrame } from "@react-three/fiber"
-import { useIntervalWhen, useKey, useKeys } from "rooks";
-import { findIndex, isEqual, last, max, maxBy, minBy, pull, sample, sortBy, times } from "lodash";
-import randomColor from 'randomcolor';
-import { Block, Plane, Shape } from "@/components";
-import { PLAYGROUND_HEIGHT, PLAYGROUND_SIZE, SHAPES } from "@/constants";
-import { checkPos, getInitialShape, repositionShape, rotateShape } from "@/helpers/shape";
+import { useState } from "react"
+import { Canvas } from "@react-three/fiber"
+import { useIntervalWhen, useKey } from "rooks";
+import { times } from "lodash";
+import { Block, Shape } from "@/components";
+import { PLAYGROUND_SIZE } from "@/constants";
+import { getInitialShape, repositionShape, rotateShape } from "@/helpers/shape";
 import { IBlock, IShape } from "@/types";
 
 
@@ -41,8 +40,7 @@ export default function Playground() {
     else onRepositionShape('x', 1);
   })
 
-  useKey('Space', (params) => {
-    if (params.shiftKey) return;
+  useKey('Space', () => {
     onRepositionShape('y', -1);
   })
 
