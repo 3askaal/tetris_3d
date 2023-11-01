@@ -4,6 +4,7 @@ import type { Metadata } from 'next'
 import ReactGA from 'react-ga4'
 import { ThemeProvider, theme as DEFAULT_THEME } from '3oilerplate'
 import { Inter } from 'next/font/google'
+import { LOCAL_THEME } from '../style/theme';
 import './globals.css';
 
 import 'reset-css/reset.css'
@@ -31,7 +32,12 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={inter.className}>
-        <ThemeProvider theme={DEFAULT_THEME}>
+        <ThemeProvider
+          theme={{
+            ...DEFAULT_THEME,
+            ...LOCAL_THEME
+          }}
+        >
           <DynamicWrapper>
             {children}
           </DynamicWrapper>
