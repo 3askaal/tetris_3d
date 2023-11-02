@@ -1,10 +1,10 @@
 import { Box, Spacer, Button, theme } from "3oilerplate";
 import { ChevronLeft, ChevronRight, ChevronUp, ChevronDown, ChevronsDown, RotateCw, Move } from "react-feather";
 
-export const Controls = ({ onRotate, onReposition }: any) => {
+export const Controls = ({ onRotate, onReposition, rotation }: any) => {
   return (
     <Spacer size="xs" s={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
-      <Box posr s={{ mb: 0 }}>
+      <Box posr s={{ mb: 0, transform: `rotate(${rotation}deg)` }}>
         <Box df w100p jcc s={{ flexGrow: 1 }}>
           <Button ver onClick={() => onRotate('x', 'ccw')}><ChevronUp /></Button>
         </Box>
@@ -22,7 +22,7 @@ export const Controls = ({ onRotate, onReposition }: any) => {
       <Box s={{ mb: 0 }}>
         <Button mid onClick={() => onReposition('y', -1)}><ChevronsDown /></Button>
       </Box>
-      <Box posr s={{ mb: 0 }}>
+      <Box posr s={{ mb: 0, transform: `rotate(${rotation}deg)` }}>
         <Box df w100p jcc s={{ flexGrow: 1 }}>
           <Button ver onClick={() => onReposition('z', -1)}><ChevronUp /></Button>
         </Box>
