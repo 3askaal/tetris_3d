@@ -3,7 +3,7 @@
 import { useState } from "react"
 import { Canvas, useThree } from "@react-three/fiber"
 import { useIntervalWhen, useKey } from "rooks";
-import { Box, Row, Col, Button } from "3oilerplate";
+import { Box, Row, Col, Button, Container } from "3oilerplate";
 import { ChevronLeft, ChevronRight, ChevronUp, ChevronDown, ArrowLeft, ArrowUp, ArrowRight, ArrowDown } from "react-feather";
 import { times } from "lodash";
 import { Block, Shape } from "@/components";
@@ -14,7 +14,7 @@ import { OrbitControls } from "@react-three/drei";
 
 const Page = () => {
   const [cameraAngle, setCameraAngle] = useState<number>(0);
-  const [blocks, setBlocks] = useState<IBlock[]>([]);
+  const [bottomBlocks, setBottomBlocks] = useState<IBlock[]>([]);
   const [shape, setShape] = useState<IShape>(getInitialShape());
 
   useIntervalWhen(() => {
@@ -22,15 +22,20 @@ const Page = () => {
   }, 1000)
 
   const onRepositionShape = (axis: 'x' | 'z' | 'y', direction: -1 | 1) => {
-    const positionData = repositionShape(shape, blocks, axis, direction);
-    if (!positionData) return;
+    const { newShape, newBottomBlocks } = repositionShape(shape, bottomBlocks, axis, direction);
 
-    setShape(positionData.shape);
-    setBlocks(positionData.blocks);
+    if (newShape) {
+      setShape(newShape);
+    }
+
+    if (newBottomBlocks) {
+      setBottomBlocks(newBottomBlocks);
+    }
   }
 
   const onRotateShape = (axis: 'z' | 'x', direction: 'cw' | 'ccw') => {
-    const newShape = rotateShape(shape, axis, direction);
+    const newShape = rotateShape(shape, bottomBlocks, axis, direction);
+    if (!newShape) return;
 
     setShape(newShape);
   }
@@ -66,41 +71,43 @@ const Page = () => {
   return (
     <>
       <Canvas>
-        <Playground shape={shape} blocks={blocks} />
+        <Playground shape={shape} bottomBlocks={bottomBlocks} />
       </Canvas>
-      <Box posa w100p s={{ bottom: 0, overflow: 'hidden' }}>
-        <Row>
-          <Col s={{ justifyContent: 'flex-start' }}>
-            <Box df w100p jcc s={{ flexGrow: 1 }}>
-              <Button vertical isOutline onClick={() => onRotateShape('x', 'ccw')}><ArrowUp /></Button>
-            </Box>
-            <Box df w100p jcc s={{ flexGrow: 1 }}>
-              <Button horizontal isOutline onClick={() => onRotateShape('z', 'ccw')}><ArrowLeft /></Button>
-              <Button horizontal isOutline onClick={() => onRotateShape('z', 'cw')}><ArrowRight /></Button>
-            </Box>
-            <Box df w100p jcc s={{ flexGrow: 1 }}>
-              <Button vertical isOutline onClick={() => onRotateShape('x', 'cw')}><ArrowDown /></Button>
-            </Box>
-          </Col>
-          <Col>
-            <Box df w100p jcc s={{ flexGrow: 1 }}>
-              <Button vertical isOutline onClick={() => onRepositionShape('z', -1)}><ChevronUp /></Button>
-            </Box>
-            <Box df w100p jcc s={{ flexGrow: 1 }}>
-              <Button horizontal isOutline onClick={() => onRepositionShape('x', -1)}><ChevronLeft /></Button>
-              <Button horizontal isOutline onClick={() => onRepositionShape('x', 1)}><ChevronRight /></Button>
-            </Box>
-            <Box df w100p jcc s={{ flexGrow: 1 }}>
-              <Button vertical isOutline onClick={() => onRepositionShape('z', 1)}><ChevronDown /></Button>
-            </Box>
-          </Col>
-        </Row>
+      <Box posa w100p df jcc s={{ bottom: 0, overflow: 'hidden', pb: 'l' }}>
+        <Container s={{ maxWidth: '400px' }}>
+          <Row>
+            <Col s={{ mb: 0 }}>
+              <Box df w100p jcc s={{ flexGrow: 1 }}>
+                <Button vertical onClick={() => onRotateShape('x', 'ccw')}><ArrowUp /></Button>
+              </Box>
+              <Box df w100p jcc s={{ flexGrow: 1 }}>
+                <Button horizontal onClick={() => onRotateShape('z', 'ccw')}><ArrowLeft /></Button>
+                <Button horizontal onClick={() => onRotateShape('z', 'cw')}><ArrowRight /></Button>
+              </Box>
+              <Box df w100p jcc s={{ flexGrow: 1 }}>
+                <Button vertical onClick={() => onRotateShape('x', 'cw')}><ArrowDown /></Button>
+              </Box>
+            </Col>
+            <Col s={{ mb: 0 }}>
+              <Box df w100p jcc s={{ flexGrow: 1 }}>
+                <Button vertical onClick={() => onRepositionShape('z', -1)}><ChevronUp /></Button>
+              </Box>
+              <Box df w100p jcc s={{ flexGrow: 1 }}>
+                <Button horizontal onClick={() => onRepositionShape('x', -1)}><ChevronLeft /></Button>
+                <Button horizontal onClick={() => onRepositionShape('x', 1)}><ChevronRight /></Button>
+              </Box>
+              <Box df w100p jcc s={{ flexGrow: 1 }}>
+                <Button vertical onClick={() => onRepositionShape('z', 1)}><ChevronDown /></Button>
+              </Box>
+            </Col>
+          </Row>
+        </Container>
       </Box>
     </>
   )
 }
 
-const Playground = ({ shape, blocks = [] }: { shape: IShape, blocks: IBlock[] }) => {
+const Playground = ({ shape, bottomBlocks = [] }: { shape: IShape, bottomBlocks: IBlock[] }) => {
   const { camera } = useThree();
 
   return (
@@ -114,8 +121,12 @@ const Playground = ({ shape, blocks = [] }: { shape: IShape, blocks: IBlock[] })
       >
         <Shape {...shape} />
 
-        { blocks?.map((block, i) => (
-          <Block key={`block-${i}`} position={[block.x, block.y, block.z]} color={block.color} />
+        { bottomBlocks?.map((bottomBlock, i) => (
+          <Block
+            key={`block-${i}`}
+            position={[bottomBlock.x, bottomBlock.y, bottomBlock.z]}
+            color={bottomBlock.color}
+          />
         )) }
 
         { times(PLAYGROUND_SIZE * PLAYGROUND_SIZE, (i) => {
