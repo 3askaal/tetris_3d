@@ -6,6 +6,7 @@ export const LOCAL_THEME = {
         py: 'xxs',
         height: '2rem',
         border: '0 !important',
+        background: 'transparent !important',
 
         svg: {
           stroke: 'secondary'

@@ -18,27 +18,38 @@ export const getInitialShape = () => {
   }
 }
 
-export const checkPos = (nextShape: IShape, currentBlocks: IBlock[], dimensions: any) => {
-  const hitsBlock = currentBlocks.some((block: IBlock) =>
-    nextShape.blocks.some((nextBlock) =>
-      (nextShape.pos.x + nextBlock.x) === block.x &&
-      (nextShape.pos.y + nextBlock.y) === block.y &&
-      (nextShape.pos.z + nextBlock.z) === block.z
+export const checkPos = (nextShape: IShape, bottomBlocks: IBlock[]) => {
+  const { pos, size, blocks } = nextShape;
+
+  const hitsBlock = bottomBlocks.some((bottomBlock: IBlock) =>
+    blocks.some((shapeBlock) =>
+      (pos.x + shapeBlock.x) === bottomBlock.x &&
+      (pos.y + shapeBlock.y) === bottomBlock.y &&
+      (pos.z + shapeBlock.z) === bottomBlock.z
     )
   );
 
-  const hitsSideX = (nextShape.pos.x < 0) || (nextShape.pos.x + nextShape.size.x > dimensions.width);
-  const hitsSideZ = (nextShape.pos.z < 0) || (nextShape.pos.z + nextShape.size.z > dimensions.width);
-  const hitsBottom = nextShape.pos.y === 0;
+  const hitsBottom = pos.y === 0;
+  const hitsSideX = (pos.x < 0) || (pos.x + size.x > PLAYGROUND_SIZE);
+  const hitsSideZ = (pos.z < 0) || (pos.z + size.z > PLAYGROUND_SIZE);
+  const hitsSide = hitsSideX || hitsSideZ;
 
   return {
     hitsBlock,
     hitsBottom,
-    hitsSide: hitsSideX || hitsSideZ,
+    hitsSide,
+    fix: {
+      ...(hitsSide && {
+        side: {
+          ...(hitsSideX && { x: (pos.x < 0) ? Math.abs(pos.x) : pos.x + size.x - PLAYGROUND_SIZE }),
+          ...(hitsSideZ && { z: (pos.z < 0) ? Math.abs(pos.z) : pos.z + size.z - PLAYGROUND_SIZE }),
+        }
+      })
+    }
   }
 }
 
-export const repositionShape = (shape: IShape, blocks: IBlock[], axis: 'x' | 'z' | 'y', direction: -1 | 1) => {
+export const repositionShape = (shape: IShape, bottomBlocks: IBlock[], axis: 'x' | 'z' | 'y', direction: -1 | 1) => {
   let newShape = {
     ...shape,
     pos: {
@@ -47,17 +58,17 @@ export const repositionShape = (shape: IShape, blocks: IBlock[], axis: 'x' | 'z'
     }
   };
 
-  let newBlocks = [...blocks];
+  let newBottomBlocks = [...bottomBlocks];
 
-  const { hitsBlock, hitsSide, hitsBottom } = checkPos(newShape, blocks, { width: PLAYGROUND_SIZE, height: PLAYGROUND_HEIGHT });
+  const { hitsBlock, hitsSide, hitsBottom } = checkPos(newShape, bottomBlocks);
 
   if (hitsSide) {
-    return null;
+    return {};
   }
 
   if (hitsBlock || hitsBottom) {
-    newBlocks = [
-      ...blocks,
+    newBottomBlocks = [
+      ...bottomBlocks,
       ...shape.blocks.map((block) => ({
         x: block.x + shape.pos.x,
         y: block.y + shape.pos.y,
@@ -70,12 +81,12 @@ export const repositionShape = (shape: IShape, blocks: IBlock[], axis: 'x' | 'z'
   }
 
   return {
-    shape: newShape,
-    blocks: newBlocks,
+    newShape,
+    newBottomBlocks,
   }
 }
 
-export const rotateShape = (shape: IShape, axis: 'z' | 'x', direction: 'cw' | 'ccw') => {
+export const rotateShape = (shape: IShape, blocks: IBlock[], axis: 'z' | 'x', direction: 'cw' | 'ccw') => {
   let newShape = { ...shape };
 
   const dirAxises = pull(['x', 'y', 'z'], axis) as ['x' | 'y'] | ['z' | 'y'];
@@ -115,25 +126,39 @@ export const rotateShape = (shape: IShape, axis: 'z' | 'x', direction: 'cw' | 'c
     }, { ...block } as any)
 
     return block;
-  })
+  });
 
   const negativeSpace = {
     x: (minBy(newShape.blocks, 'x')?.x || 0),
     y: (minBy(newShape.blocks, 'y')?.y || 0),
     z: (minBy(newShape.blocks, 'z')?.z || 0),
-  }
+  };
 
   newShape.blocks = newShape.blocks.map((block) => ({
     ...block,
     x: negativeSpace.x < 0 ? block.x + Math.abs(negativeSpace.x) : block.x - Math.abs(negativeSpace.x),
     y: negativeSpace.y < 0 ? block.y + Math.abs(negativeSpace.y) : block.y - Math.abs(negativeSpace.y),
     z: negativeSpace.z < 0 ? block.z + Math.abs(negativeSpace.z) : block.z - Math.abs(negativeSpace.z),
-  }))
+  }));
 
   newShape.size = {
     x: (maxBy(newShape.blocks, 'x')?.x || 0) + 1,
     y: (maxBy(newShape.blocks, 'y')?.y || 0) + 1,
     z: (maxBy(newShape.blocks, 'z')?.z || 0) + 1,
+  };
+
+  const { hitsBlock, hitsBottom, hitsSide, fix } = checkPos(newShape, blocks)
+
+  if (hitsBlock || hitsBottom) {
+    return null
+  }
+
+  if (hitsSide) {
+    newShape.pos = {
+      x: newShape.pos.x - (fix?.side?.x || 0),
+      z: newShape.pos.z - (fix?.side?.z || 0),
+      y: newShape.pos.y
+    }
   }
 
   return newShape;
