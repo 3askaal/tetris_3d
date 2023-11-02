@@ -3,8 +3,8 @@
 import { useState } from "react"
 import { Canvas, useThree } from "@react-three/fiber"
 import { useIntervalWhen, useKey } from "rooks";
-import { Box, Row, Col, Button, Container } from "3oilerplate";
-import { ChevronLeft, ChevronRight, ChevronUp, ChevronDown, ArrowLeft, ArrowUp, ArrowRight, ArrowDown } from "react-feather";
+import { Box, Spacer, Button, Container } from "3oilerplate";
+import { ChevronLeft, ChevronRight, ChevronUp, ChevronDown, ArrowLeft, ArrowUp, ArrowRight, ArrowDown, ChevronsDown } from "react-feather";
 import { times } from "lodash";
 import { Block, Shape } from "@/components";
 import { PLAYGROUND_SIZE } from "@/constants";
@@ -75,32 +75,35 @@ const Page = () => {
       </Canvas>
       <Box posa w100p df jcc s={{ bottom: 0, overflow: 'hidden', pb: 'l' }}>
         <Container s={{ maxWidth: '400px' }}>
-          <Row>
-            <Col s={{ mb: 0 }}>
+          <Spacer s={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
+            <Box s={{ mb: 0 }}>
               <Box df w100p jcc s={{ flexGrow: 1 }}>
-                <Button vertical onClick={() => onRotateShape('x', 'ccw')}><ArrowUp /></Button>
+                <Button ver onClick={() => onRotateShape('x', 'ccw')}><ArrowUp /></Button>
               </Box>
               <Box df w100p jcc s={{ flexGrow: 1 }}>
-                <Button horizontal onClick={() => onRotateShape('z', 'ccw')}><ArrowLeft /></Button>
-                <Button horizontal onClick={() => onRotateShape('z', 'cw')}><ArrowRight /></Button>
+                <Button hor onClick={() => onRotateShape('z', 'ccw')}><ArrowLeft /></Button>
+                <Button hor onClick={() => onRotateShape('z', 'cw')}><ArrowRight /></Button>
               </Box>
               <Box df w100p jcc s={{ flexGrow: 1 }}>
-                <Button vertical onClick={() => onRotateShape('x', 'cw')}><ArrowDown /></Button>
+                <Button ver onClick={() => onRotateShape('x', 'cw')}><ArrowDown /></Button>
               </Box>
-            </Col>
-            <Col s={{ mb: 0 }}>
+            </Box>
+            <Box s={{ mb: 0 }}>
+              <Button mid onClick={() => onRepositionShape('y', -1)}><ChevronsDown /></Button>
+            </Box>
+            <Box s={{ mb: 0 }}>
               <Box df w100p jcc s={{ flexGrow: 1 }}>
-                <Button vertical onClick={() => onRepositionShape('z', -1)}><ChevronUp /></Button>
+                <Button ver onClick={() => onRepositionShape('z', -1)}><ChevronUp /></Button>
               </Box>
               <Box df w100p jcc s={{ flexGrow: 1 }}>
-                <Button horizontal onClick={() => onRepositionShape('x', -1)}><ChevronLeft /></Button>
-                <Button horizontal onClick={() => onRepositionShape('x', 1)}><ChevronRight /></Button>
+                <Button hor onClick={() => onRepositionShape('x', -1)}><ChevronLeft /></Button>
+                <Button hor onClick={() => onRepositionShape('x', 1)}><ChevronRight /></Button>
               </Box>
               <Box df w100p jcc s={{ flexGrow: 1 }}>
-                <Button vertical onClick={() => onRepositionShape('z', 1)}><ChevronDown /></Button>
+                <Button ver onClick={() => onRepositionShape('z', 1)}><ChevronDown /></Button>
               </Box>
-            </Col>
-          </Row>
+            </Box>
+          </Spacer>
         </Container>
       </Box>
     </>

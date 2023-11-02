@@ -13,12 +13,16 @@ export const LOCAL_THEME = {
         }
       },
       variants: {
-        vertical: {
-          width: '6rem',
-        },
-        horizontal: {
+        ver: {
           width: '4rem',
         },
+        hor: {
+          width: '4rem',
+        },
+        mid: {
+          width: '3rem',
+          height: '3rem'
+        }
       }
     }
   }
