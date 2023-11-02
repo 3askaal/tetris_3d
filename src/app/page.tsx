@@ -3,14 +3,14 @@
 import { useState } from "react"
 import { Canvas, useThree } from "@react-three/fiber"
 import { useIntervalWhen, useKey } from "rooks";
-import { Box, Spacer, Button, Container } from "3oilerplate";
-import { ChevronLeft, ChevronRight, ChevronUp, ChevronDown, ArrowLeft, ArrowUp, ArrowRight, ArrowDown, ChevronsDown } from "react-feather";
+import { Box, Container } from "3oilerplate";
 import { times } from "lodash";
 import { Block, Shape } from "@/components";
 import { PLAYGROUND_SIZE } from "@/constants";
 import { getInitialShape, repositionShape, rotateShape } from "@/helpers/shape";
 import { IBlock, IShape } from "@/types";
 import { OrbitControls } from "@react-three/drei";
+import { Controls } from "@/components/Controls";
 
 const Page = () => {
   const [cameraAngle, setCameraAngle] = useState<number>(0);
@@ -75,35 +75,7 @@ const Page = () => {
       </Canvas>
       <Box posa w100p df jcc s={{ bottom: 0, overflow: 'hidden', pb: 'l' }}>
         <Container s={{ maxWidth: '400px' }}>
-          <Spacer s={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
-            <Box s={{ mb: 0 }}>
-              <Box df w100p jcc s={{ flexGrow: 1 }}>
-                <Button ver onClick={() => onRotateShape('x', 'ccw')}><ArrowUp /></Button>
-              </Box>
-              <Box df w100p jcc s={{ flexGrow: 1 }}>
-                <Button hor onClick={() => onRotateShape('z', 'ccw')}><ArrowLeft /></Button>
-                <Button hor onClick={() => onRotateShape('z', 'cw')}><ArrowRight /></Button>
-              </Box>
-              <Box df w100p jcc s={{ flexGrow: 1 }}>
-                <Button ver onClick={() => onRotateShape('x', 'cw')}><ArrowDown /></Button>
-              </Box>
-            </Box>
-            <Box s={{ mb: 0 }}>
-              <Button mid onClick={() => onRepositionShape('y', -1)}><ChevronsDown /></Button>
-            </Box>
-            <Box s={{ mb: 0 }}>
-              <Box df w100p jcc s={{ flexGrow: 1 }}>
-                <Button ver onClick={() => onRepositionShape('z', -1)}><ChevronUp /></Button>
-              </Box>
-              <Box df w100p jcc s={{ flexGrow: 1 }}>
-                <Button hor onClick={() => onRepositionShape('x', -1)}><ChevronLeft /></Button>
-                <Button hor onClick={() => onRepositionShape('x', 1)}><ChevronRight /></Button>
-              </Box>
-              <Box df w100p jcc s={{ flexGrow: 1 }}>
-                <Button ver onClick={() => onRepositionShape('z', 1)}><ChevronDown /></Button>
-              </Box>
-            </Box>
-          </Spacer>
+          <Controls onRotate={onRotateShape} onReposition={onRepositionShape} />
         </Container>
       </Box>
     </>
@@ -148,6 +120,7 @@ const Playground = ({ shape, bottomBlocks = [] }: { shape: IShape, bottomBlocks:
           maxDistance={4.5}
           enableRotate={true}
           rotation={[Math.PI / 5, Math.PI / 5, Math.PI / 5]}
+          onChange={(e) => console.log(e)}
           target={[0, 0, 0.7]}
           minPolarAngle={1.5}
           maxPolarAngle={1.5}

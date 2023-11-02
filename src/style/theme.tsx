@@ -9,7 +9,9 @@ export const LOCAL_THEME = {
         background: 'transparent !important',
 
         svg: {
-          stroke: 'secondary'
+          stroke: 'secondaryDark',
+          width: '32px',
+          height: '32px'
         }
       },
       variants: {
