@@ -73,7 +73,7 @@ const Page = () => {
       <Canvas>
         <Playground shape={shape} bottomBlocks={bottomBlocks} />
       </Canvas>
-      <Box posa w100p df jcc s={{ bottom: 0, overflow: 'hidden', pb: 'l' }}>
+      <Box posa w100p df jcc s={{ bottom: 0, overflow: 'hidden', pb: 'm' }}>
         <Container s={{ maxWidth: '400px' }}>
           <Controls onRotate={onRotateShape} onReposition={onRepositionShape} />
         </Container>
