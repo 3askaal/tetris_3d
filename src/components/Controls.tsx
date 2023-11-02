@@ -3,7 +3,7 @@ import { ChevronLeft, ChevronRight, ChevronUp, ChevronDown, ChevronsDown, Rotate
 
 export const Controls = ({ onRotate, onReposition }: any) => {
   return (
-    <Spacer s={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
+    <Spacer size="xs" s={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
       <Box posr s={{ mb: 0 }}>
         <Box df w100p jcc s={{ flexGrow: 1 }}>
           <Button ver onClick={() => onRotate('x', 'ccw')}><ChevronUp /></Button>
@@ -15,8 +15,8 @@ export const Controls = ({ onRotate, onReposition }: any) => {
         <Box df w100p jcc s={{ flexGrow: 1 }}>
           <Button ver onClick={() => onRotate('x', 'cw')}><ChevronDown /></Button>
         </Box>
-        <Box df posa aic jcc r={0} l={0} b={0} t={0} s={{ svg: { stroke: theme.colors.greys['70'] }, pointerEvents: 'none' }}>
-          <RotateCw size={16} />
+        <Box df posa aic jcc r={0} l={0} b={0} t={0} s={{ svg: { stroke: theme.colors.greys['90'] }, pointerEvents: 'none' }}>
+          <RotateCw size={20}/>
         </Box>
       </Box>
       <Box s={{ mb: 0 }}>
@@ -33,8 +33,8 @@ export const Controls = ({ onRotate, onReposition }: any) => {
         <Box df w100p jcc s={{ flexGrow: 1 }}>
           <Button ver onClick={() => onReposition('z', 1)}><ChevronDown /></Button>
         </Box>
-        <Box df posa aic jcc r={0} l={0} b={0} t={0} s={{ svg: { stroke: theme.colors.greys['80'] }, pointerEvents: 'none' }}>
-          <Move size={16} />
+        <Box df posa aic jcc r={0} l={0} b={0} t={0} s={{ svg: { stroke: theme.colors.greys['90'] }, pointerEvents: 'none' }}>
+          <Move size={20}/>
         </Box>
       </Box>
     </Spacer>

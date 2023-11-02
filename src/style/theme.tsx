@@ -4,9 +4,10 @@ export const LOCAL_THEME = {
       default: {
         px: 'xs',
         py: 'xxs',
-        height: '2rem',
         border: '0 !important',
         background: 'transparent !important',
+        width: '4rem',
+        height: '2.5rem',
 
         svg: {
           stroke: 'secondaryDark',
@@ -15,11 +16,10 @@ export const LOCAL_THEME = {
         }
       },
       variants: {
-        ver: {
-          width: '4rem',
-        },
         hor: {
-          width: '4rem',
+          '+ *': {
+            ml: '1rem'
+          }
         },
         mid: {
           width: '3rem',
