@@ -2,7 +2,7 @@
 
 import { useState } from "react"
 import { Canvas, useThree } from "@react-three/fiber"
-import { useIntervalWhen, useKey } from "rooks";
+import { useDebouncedValue, useIntervalWhen, useKey } from "rooks";
 import { Box, Container } from "3oilerplate";
 import { times } from "lodash";
 import { Block, Shape } from "@/components";
@@ -13,7 +13,7 @@ import { OrbitControls } from "@react-three/drei";
 import { Controls } from "@/components/Controls";
 
 const Page = () => {
-  const [cameraAngle, setCameraAngle] = useState<number>(0);
+  const [rotation, setRotation] = useDebouncedValue<number>(0, 1000);
   const [bottomBlocks, setBottomBlocks] = useState<IBlock[]>([]);
   const [shape, setShape] = useState<IShape>(getInitialShape());
 
@@ -42,25 +42,25 @@ const Page = () => {
 
   useKey('ArrowUp', (params) => {
     if (params.shiftKey) onRotateShape('x', 'cw');
-    else if (params.altKey) setCameraAngle(cameraAngle + 1);
+    else if (params.altKey) setRotation(0);
     else onRepositionShape('z', -1);
   })
 
   useKey('ArrowDown', (params) => {
     if (params.shiftKey) onRotateShape('x', 'ccw');
-    else if (params.altKey) setCameraAngle(cameraAngle + 1);
+    else if (params.altKey) setRotation(0);
     else onRepositionShape('z', 1);
   })
 
   useKey('ArrowLeft', (params) => {
     if (params.shiftKey) onRotateShape('z', 'ccw');
-    else if (params.altKey) setCameraAngle(cameraAngle + 1);
+    else if (params.altKey) setRotation(0);
     else onRepositionShape('x', -1);
   })
 
   useKey('ArrowRight', (params) => {
     if (params.shiftKey) onRotateShape('z', 'cw');
-    else if (params.altKey) setCameraAngle(cameraAngle + 1);
+    else if (params.altKey) setRotation(0);
     else onRepositionShape('x', 1);
   })
 
@@ -68,21 +68,28 @@ const Page = () => {
     onRepositionShape('y', -1);
   })
 
+  const onRotate = (e: any) => {
+    const radians = e.target.getAzimuthalAngle();
+    const newRotation = radians * (180 / Math.PI);
+
+    setRotation(newRotation);
+  }
+
   return (
     <>
       <Canvas>
-        <Playground shape={shape} bottomBlocks={bottomBlocks} />
+        <Playground shape={shape} bottomBlocks={bottomBlocks} onRotate={onRotate} />
       </Canvas>
       <Box posa w100p df jcc s={{ bottom: 0, overflow: 'hidden', pb: 'm' }}>
         <Container s={{ maxWidth: '400px' }}>
-          <Controls onRotate={onRotateShape} onReposition={onRepositionShape} />
+          <Controls onRotate={onRotateShape} onReposition={onRepositionShape} rotation={rotation} />
         </Container>
       </Box>
     </>
   )
 }
 
-const Playground = ({ shape, bottomBlocks = [] }: { shape: IShape, bottomBlocks: IBlock[] }) => {
+const Playground = ({ shape, bottomBlocks = [], onRotate }: { shape: IShape, bottomBlocks: IBlock[], onRotate: any }) => {
   const { camera } = useThree();
 
   return (
@@ -120,7 +127,7 @@ const Playground = ({ shape, bottomBlocks = [] }: { shape: IShape, bottomBlocks:
           maxDistance={4.5}
           enableRotate={true}
           rotation={[Math.PI / 5, Math.PI / 5, Math.PI / 5]}
-          onChange={(e) => console.log(e)}
+          onChange={onRotate}
           target={[0, 0, 0.7]}
           minPolarAngle={1.5}
           maxPolarAngle={1.5}
