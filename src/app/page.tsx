@@ -96,12 +96,7 @@ const Playground = ({ shape, bottomBlocks = [], onRotate }: { shape: IShape, bot
   return (
     <>
       <ambientLight />
-      {/* <pointLight position={[10, 10, 10]} /> */}
-      <group
-        // rotation={[0, (Math.PI / 4) * cameraAngle, 0]}
-        position={[-0.7, -1.5, 0]}
-        scale={0.2}
-      >
+      <group scale={0.2}>
         <Shape {...shape} />
 
         { bottomBlocks?.map((bottomBlock, i) => (
@@ -125,9 +120,8 @@ const Playground = ({ shape, bottomBlocks = [], onRotate }: { shape: IShape, bot
           enableRotate={true}
           enableZoom={false}
           enablePan={false}
-          rotation={[Math.PI / 5, Math.PI / 5, Math.PI / 5]}
           onChange={onRotate}
-          target={[0, 0, 0.725]}
+          target={[0.7, 1.4, 0.7]}
           minPolarAngle={1.5}
           maxPolarAngle={1.5}
         />
