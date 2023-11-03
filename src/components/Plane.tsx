@@ -1,15 +1,15 @@
 import { useRef, useState } from "react"
 import { Edges } from "@react-three/drei"
+import { IBlock } from "@/types"
 
-export const Plane = ({ color, ...props }: any) => {
-  const ref = useRef({ rotation: { x: 0, y: 0 } })
+export const Plane = ({ x, y, z, color, ...props }: IBlock) => {
   const [hovered, hover] = useState(false)
   const [clicked, click] = useState(false)
 
   return (
     <mesh
       {...props}
-      ref={ref}
+      position={[x, y, z]}
       scale={0.9}
       onClick={(event) => click(!clicked)}
       onPointerOver={(event) => hover(true)}

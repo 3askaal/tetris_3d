@@ -9,6 +9,7 @@ import './globals.css';
 
 import 'reset-css/reset.css'
 import dynamic from 'next/dynamic';
+import { FC, PropsWithChildren } from 'react';
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -16,7 +17,7 @@ ReactGA.initialize('G-NF6H1LMC3H', {
   testMode: process.env.NODE_ENV === 'development'
 })
 
-const NonSSRWrapper = ({ children }: any) => (
+const NonSSRWrapper: FC<PropsWithChildren> = ({ children }) => (
   <>{children}</>
 )
 
