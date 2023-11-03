@@ -9,9 +9,8 @@ import { Block, Shape } from "@/components";
 import { PLAYGROUND_SIZE } from "@/constants";
 import { getInitialShape, repositionShape, rotateShape } from "@/helpers/shape";
 import { IBlock, IShape } from "@/types";
-import { OrbitControls, OrbitControlsChangeEvent } from "@react-three/drei";
+import { OrbitControls } from "@react-three/drei";
 import { Controls } from "@/components/Controls";
-import { IntersectionEvent } from "@react-three/fiber/dist/declarations/src/core/events";
 
 const Page = () => {
   const [rotation, setRotation] = useDebouncedValue<number>(0, 1000);
@@ -46,25 +45,23 @@ const Page = () => {
 
   useKey('ArrowUp', (params: KeyboardEvent) => {
     if (params.shiftKey) onRotateShape('x', 'cw');
-    else if (params.altKey) setRotation(0);
     else onRepositionShape('z', -1);
   })
 
   useKey('ArrowDown', (params: KeyboardEvent) => {
     if (params.shiftKey) onRotateShape('x', 'ccw');
-    else if (params.altKey) setRotation(0);
     else onRepositionShape('z', 1);
   })
 
   useKey('ArrowLeft', (params: KeyboardEvent) => {
     if (params.shiftKey) onRotateShape('z', 'ccw');
-    else if (params.altKey) setRotation(0);
+    else if (params.altKey) setRotation(rotation - 90);
     else onRepositionShape('x', -1);
   })
 
   useKey('ArrowRight', (params: KeyboardEvent) => {
     if (params.shiftKey) onRotateShape('z', 'cw');
-    else if (params.altKey) setRotation(0);
+    else if (params.altKey) setRotation(rotation + 90);
     else onRepositionShape('x', 1);
   })
 
