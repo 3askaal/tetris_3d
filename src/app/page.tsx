@@ -11,15 +11,12 @@ import { getInitialShape, repositionShape, rotateShape } from "@/helpers/shape";
 import { IBlock, IShape } from "@/types";
 import { OrbitControls, OrbitControlsChangeEvent } from "@react-three/drei";
 import { Controls } from "@/components/Controls";
+import { IntersectionEvent } from "@react-three/fiber/dist/declarations/src/core/events";
 
 const Page = () => {
   const [rotation, setRotation] = useDebouncedValue<number>(0, 1000);
   const [bottomBlocks, setBottomBlocks] = useState<IBlock[]>([]);
   const [shape, setShape] = useState<IShape>(getInitialShape());
-
-  useIntervalWhen(() => {
-    onRepositionShape('y', -1);
-  }, 1000)
 
   const onRepositionShape = (axis: 'x' | 'z' | 'y', direction: -1 | 1) => {
     const { newShape, newBottomBlocks } = repositionShape(shape, bottomBlocks, axis, direction);
@@ -40,10 +37,8 @@ const Page = () => {
     setShape(newShape);
   }
 
-  const onRotatePlayground = (event?: ThreeEvent<{ target: { getAzimuthalAngle: () => number } }>) => {
-    if (!event) return;
-
-    const rotationRadians = event.target.getAzimuthalAngle();
+  const onRotatePlayground = (event: any): void => {
+    const rotationRadians = event.target?.getAzimuthalAngle() || 0;
     const newRotation = rotationRadians * (180 / Math.PI);
 
     setRotation(newRotation);
@@ -77,6 +72,10 @@ const Page = () => {
     onRepositionShape('y', -1);
   })
 
+  useIntervalWhen(() => {
+    onRepositionShape('y', -1);
+  }, 1000)
+
   return (
     <>
       <Canvas>
@@ -91,7 +90,7 @@ const Page = () => {
   )
 }
 
-const Playground = ({ shape, bottomBlocks = [], onRotate }: { shape: IShape, bottomBlocks: IBlock[], onRotate: (event?: OrbitControlsChangeEvent) => void }) => {
+const Playground = ({ shape, bottomBlocks = [], onRotate }: { shape: IShape, bottomBlocks: IBlock[], onRotate: (event: any) => void }) => {
   const { camera } = useThree();
 
   return (
