@@ -86,6 +86,8 @@ export const repositionShape = (shape: IShape, bottomBlocks: IBlock[], axis: 'x'
   }
 }
 
+type TAxis = 'x' | 'y' | 'z';
+
 export const rotateShape = (shape: IShape, blocks: IBlock[], axis: 'z' | 'x', direction: 'cw' | 'ccw') => {
   let newShape = { ...shape };
 
@@ -93,14 +95,12 @@ export const rotateShape = (shape: IShape, blocks: IBlock[], axis: 'z' | 'x', di
   const maxSize = (max(dirAxises.map((key) => shape.size[key])) as number) - 1;
   const oppositeAxis = axis === 'z' ? 'x' : 'z';
 
-  const orders = {
+  const orders: { cw: [TAxis, number][], ccw: [TAxis, number][] } = {
     cw: [[oppositeAxis, 0], ['y', maxSize], [oppositeAxis, maxSize], ['y', 0]],
     ccw: [['y', 0], [oppositeAxis, maxSize], ['y', maxSize], [oppositeAxis, 0]],
   };
 
-  const axisChecks = dirAxises.map((dirAxis) => {
-    return [[dirAxis, 0], [dirAxis, maxSize]];
-  }).flat() as ['x' | 'y' | 'z', number][];
+  const axisChecks = dirAxises.map((dirAxis) => [[dirAxis, 0], [dirAxis, maxSize]]).flat() as [TAxis, number][];
 
   newShape.blocks = newShape.blocks.map((block) => {
     const axisCheckMatches = axisChecks
@@ -113,17 +113,15 @@ export const rotateShape = (shape: IShape, blocks: IBlock[], axis: 'z' | 'x', di
       axisCheckMatches.reverse();
     }
 
-    block = [axisCheckMatches[0]].reduce((acc, axisCheckMatch) => {
-      const currentSideIndex = findIndex(orders[direction], (value) => isEqual(value, axisCheckMatch));
-      const currentSide = orders[direction][currentSideIndex];
-      const nextSide = orders[direction][currentSideIndex + 1] || orders[direction][0];
+    const currentSideIndex = findIndex(orders[direction], (value) => isEqual(value, axisCheckMatches[0]));
+    const currentSide = orders[direction][currentSideIndex];
+    const nextSide = orders[direction][currentSideIndex + 1] || orders[direction][0];
 
-      return {
-        ...acc,
-        [nextSide[0]]: nextSide[1],
-        [currentSide[0]]: acc[nextSide[0]]
-      }
-    }, { ...block } as any)
+    block = {
+      ...block,
+      [nextSide[0]]: nextSide[1],
+      [currentSide[0]]: block[nextSide[0]]
+    }
 
     return block;
   });

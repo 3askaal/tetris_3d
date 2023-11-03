@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react"
-import { Canvas, useThree } from "@react-three/fiber"
+import { Canvas, ThreeEvent, useThree } from "@react-three/fiber"
 import { useDebouncedValue, useIntervalWhen, useKey } from "rooks";
 import { Box, Container } from "3oilerplate";
 import { times } from "lodash";
@@ -9,7 +9,7 @@ import { Block, Shape } from "@/components";
 import { PLAYGROUND_SIZE } from "@/constants";
 import { getInitialShape, repositionShape, rotateShape } from "@/helpers/shape";
 import { IBlock, IShape } from "@/types";
-import { OrbitControls } from "@react-three/drei";
+import { OrbitControls, OrbitControlsChangeEvent } from "@react-three/drei";
 import { Controls } from "@/components/Controls";
 
 const Page = () => {
@@ -40,25 +40,34 @@ const Page = () => {
     setShape(newShape);
   }
 
-  useKey('ArrowUp', (params) => {
+  const onRotatePlayground = (event?: ThreeEvent<{ target: { getAzimuthalAngle: () => number } }>) => {
+    if (!event) return;
+
+    const rotationRadians = event.target.getAzimuthalAngle();
+    const newRotation = rotationRadians * (180 / Math.PI);
+
+    setRotation(newRotation);
+  }
+
+  useKey('ArrowUp', (params: KeyboardEvent) => {
     if (params.shiftKey) onRotateShape('x', 'cw');
     else if (params.altKey) setRotation(0);
     else onRepositionShape('z', -1);
   })
 
-  useKey('ArrowDown', (params) => {
+  useKey('ArrowDown', (params: KeyboardEvent) => {
     if (params.shiftKey) onRotateShape('x', 'ccw');
     else if (params.altKey) setRotation(0);
     else onRepositionShape('z', 1);
   })
 
-  useKey('ArrowLeft', (params) => {
+  useKey('ArrowLeft', (params: KeyboardEvent) => {
     if (params.shiftKey) onRotateShape('z', 'ccw');
     else if (params.altKey) setRotation(0);
     else onRepositionShape('x', -1);
   })
 
-  useKey('ArrowRight', (params) => {
+  useKey('ArrowRight', (params: KeyboardEvent) => {
     if (params.shiftKey) onRotateShape('z', 'cw');
     else if (params.altKey) setRotation(0);
     else onRepositionShape('x', 1);
@@ -68,17 +77,10 @@ const Page = () => {
     onRepositionShape('y', -1);
   })
 
-  const onRotate = (e: any) => {
-    const radians = e.target.getAzimuthalAngle();
-    const newRotation = radians * (180 / Math.PI);
-
-    setRotation(newRotation);
-  }
-
   return (
     <>
       <Canvas>
-        <Playground shape={shape} bottomBlocks={bottomBlocks} onRotate={onRotate} />
+        <Playground shape={shape} bottomBlocks={bottomBlocks} onRotate={onRotatePlayground} />
       </Canvas>
       <Box posa w100p df jcc s={{ bottom: 0, overflow: 'hidden', pb: 'm' }}>
         <Container s={{ maxWidth: '400px' }}>
@@ -89,7 +91,7 @@ const Page = () => {
   )
 }
 
-const Playground = ({ shape, bottomBlocks = [], onRotate }: { shape: IShape, bottomBlocks: IBlock[], onRotate: any }) => {
+const Playground = ({ shape, bottomBlocks = [], onRotate }: { shape: IShape, bottomBlocks: IBlock[], onRotate: (event?: OrbitControlsChangeEvent) => void }) => {
   const { camera } = useThree();
 
   return (
@@ -104,11 +106,7 @@ const Playground = ({ shape, bottomBlocks = [], onRotate }: { shape: IShape, bot
         <Shape {...shape} />
 
         { bottomBlocks?.map((bottomBlock, i) => (
-          <Block
-            key={`block-${i}`}
-            position={[bottomBlock.x, bottomBlock.y, bottomBlock.z]}
-            color={bottomBlock.color}
-          />
+          <Block key={`block-${i}`} {...bottomBlock} />
         )) }
 
         { times(PLAYGROUND_SIZE * PLAYGROUND_SIZE, (i) => {
@@ -117,7 +115,7 @@ const Playground = ({ shape, bottomBlocks = [], onRotate }: { shape: IShape, bot
           const y = 0;
 
           return (
-            <Block key={`bottom-${i}`} position={[x, y, z]} color={'#ffffff'} />
+            <Block key={`bottom-${i}`} x={x} y={y} z={z} color={'#ffffff'} />
           )
         }) }
 

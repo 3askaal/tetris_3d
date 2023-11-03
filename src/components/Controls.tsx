@@ -1,7 +1,13 @@
 import { Box, Spacer, Button, theme } from "3oilerplate";
 import { ChevronLeft, ChevronRight, ChevronUp, ChevronDown, ChevronsDown, RotateCw, Move } from "react-feather";
 
-export const Controls = ({ onRotate, onReposition, rotation }: any) => {
+interface ControlsProps {
+  onRotate: (axis: 'x' | 'z', direction: 'cw' | 'ccw') => void;
+  onReposition: (axis: 'x' | 'z', direction: 1 | -1) => void;
+  rotation: number;
+}
+
+export const Controls = ({ onRotate, onReposition, rotation }: ControlsProps) => {
   return (
     <Spacer size="xs" s={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
       <Box posr s={{ mb: 0, transform: `rotate(${rotation}deg)` }}>
