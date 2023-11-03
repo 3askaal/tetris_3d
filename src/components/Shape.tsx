@@ -14,7 +14,7 @@ export const Shape = ({ blocks, pos, size, color }: IShape) => {
   })
 
   const onPointerMove = (event: ThreeEvent<PointerEvent>) => {
-    console.log('distance: ', event.distance);
+    // console.log('distance: ', event.distance);
   }
 
   return (
