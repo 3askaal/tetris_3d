@@ -121,12 +121,14 @@ const Playground = ({ shape, bottomBlocks = [], onRotate }: { shape: IShape, bot
 
         <OrbitControls
           camera={camera}
-          minDistance={4.5}
-          maxDistance={4.5}
+          minDistance={4.25}
+          maxDistance={4.25}
           enableRotate={true}
+          enableZoom={false}
+          enablePan={false}
           rotation={[Math.PI / 5, Math.PI / 5, Math.PI / 5]}
           onChange={onRotate}
-          target={[0, 0, 0.7]}
+          target={[0, 0, 0.725]}
           minPolarAngle={1.5}
           maxPolarAngle={1.5}
         />
