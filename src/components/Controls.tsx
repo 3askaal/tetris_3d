@@ -3,7 +3,7 @@ import { ChevronLeft, ChevronRight, ChevronUp, ChevronDown, ChevronsDown, Rotate
 
 interface ControlsProps {
   onRotate: (axis: 'x' | 'z', direction: 'cw' | 'ccw') => void;
-  onReposition: (axis: 'x' | 'z', direction: 1 | -1) => void;
+  onReposition: (axis: 'x' | 'y' | 'z', direction: 1 | -1) => void;
   rotation: number;
 }
 
