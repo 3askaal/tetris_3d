@@ -103,15 +103,15 @@ export const rotateShape = (shape: IShape, blocks: IBlock[], axis: 'x' | 'y', di
   const axisChecks = dirAxises.map((dirAxis) => [[dirAxis, 0], [dirAxis, maxSize]]).flat() as [TAxis, number][];
 
   newShape.blocks = newShape.blocks.map((block) => {
-    const axisCheckMatches = axisChecks
-      .filter((axisCheck) => {
-        return block[axisCheck[0]] === axisCheck[1]
-      });
+    const axisCheckMatches = axisChecks.filter((axisCheck) => block[axisCheck[0]] === axisCheck[1]);
 
-    // TODO: figure out why this works
-    // // if (axis === 'y' && direction === 'cw') {
-    //   axisCheckMatches.reverse();
-    // }
+    if (!axisCheckMatches.length) {
+      return block;
+    }
+
+    if (axis === 'x' && direction === 'ccw' || axis === 'y' && direction === 'ccw') {
+      axisCheckMatches.reverse();
+    }
 
     const currentSideIndex = findIndex(orders[direction], (value) => isEqual(value, axisCheckMatches[0]));
     const currentSide = orders[direction][currentSideIndex];
