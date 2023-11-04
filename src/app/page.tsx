@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { Canvas, ThreeEvent, useThree } from "@react-three/fiber"
 import { useDebouncedValue, useIntervalWhen, useKey } from "rooks";
 import { Box, Container } from "3oilerplate";
@@ -43,26 +43,74 @@ const Page = () => {
     setRotation(newRotation);
   }
 
+  const controls = {
+    up: {
+      position: () => onRepositionShape('z', -1),
+      rotate: () => onRotateShape('x', 'cw'),
+    },
+    down: {
+      position: () => onRepositionShape('z', 1),
+      rotate: () => onRotateShape('x', 'ccw'),
+    },
+    left: {
+      position: () => onRepositionShape('x', -1),
+      rotate: () => onRotateShape('y', 'ccw'),
+    },
+    right: {
+      position: () => onRepositionShape('x', 1),
+      rotate: () => onRotateShape('y', 'cw'),
+    },
+  }
+
+  const rotatedControls = () => {
+    if (rotation < 45 && rotation > -45) {
+      return controls;
+    }
+
+    if (rotation >= 45 && rotation < 135) {
+      return {
+        up: controls.left,
+        down: controls.right,
+        left: controls.down,
+        right: controls.up
+      }
+    }
+
+    if (rotation < -45 && rotation > -135) {
+      return {
+        up: controls.right,
+        down: controls.left,
+        left: controls.up,
+        right: controls.down
+      }
+    }
+
+    return {
+      up: controls.down,
+      down: controls.up,
+      left: controls.right,
+      right: controls.left
+    }
+  }
+
   useKey('ArrowUp', (params: KeyboardEvent) => {
-    if (params.shiftKey) onRotateShape('x', 'cw');
-    else onRepositionShape('z', -1);
+    if (params.shiftKey) rotatedControls().up.rotate();
+    else rotatedControls().up.position();
   })
 
   useKey('ArrowDown', (params: KeyboardEvent) => {
-    if (params.shiftKey) onRotateShape('x', 'ccw');
-    else onRepositionShape('z', 1);
+    if (params.shiftKey) rotatedControls().down.rotate();
+    else rotatedControls().down.position();
   })
 
   useKey('ArrowLeft', (params: KeyboardEvent) => {
-    if (params.shiftKey) onRotateShape('y', 'ccw');
-    else if (params.altKey) setRotation(rotation - 90);
-    else onRepositionShape('x', -1);
+    if (params.shiftKey) rotatedControls().left.rotate();
+    else rotatedControls().left.position();
   })
 
   useKey('ArrowRight', (params: KeyboardEvent) => {
-    if (params.shiftKey) onRotateShape('y', 'cw');
-    else if (params.altKey) setRotation(rotation + 90);
-    else onRepositionShape('x', 1);
+    if (params.shiftKey) rotatedControls().right.rotate();
+    else rotatedControls().right.position();
   })
 
   useKey('Space', () => {
