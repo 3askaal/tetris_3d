@@ -29,7 +29,7 @@ const Page = () => {
     }
   }
 
-  const onRotateShape = (axis: 'z' | 'x', direction: 'cw' | 'ccw') => {
+  const onRotateShape = (axis: 'x' | 'y', direction: 'cw' | 'ccw') => {
     const newShape = rotateShape(shape, bottomBlocks, axis, direction);
     if (!newShape) return;
 
@@ -54,13 +54,13 @@ const Page = () => {
   })
 
   useKey('ArrowLeft', (params: KeyboardEvent) => {
-    if (params.shiftKey) onRotateShape('z', 'ccw');
+    if (params.shiftKey) onRotateShape('y', 'ccw');
     else if (params.altKey) setRotation(rotation - 90);
     else onRepositionShape('x', -1);
   })
 
   useKey('ArrowRight', (params: KeyboardEvent) => {
-    if (params.shiftKey) onRotateShape('z', 'cw');
+    if (params.shiftKey) onRotateShape('y', 'cw');
     else if (params.altKey) setRotation(rotation + 90);
     else onRepositionShape('x', 1);
   })

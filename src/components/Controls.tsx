@@ -2,7 +2,7 @@ import { Spacer, s } from "3oilerplate";
 import { ChevronLeft, ChevronRight, ChevronUp, ChevronDown, ChevronsDown, RotateCw, Move } from "react-feather";
 
 interface ControlsProps {
-  onRotate: (axis: 'x' | 'z', direction: 'cw' | 'ccw') => void;
+  onRotate: (axis: 'x' | 'y', direction: 'cw' | 'ccw') => void;
   onReposition: (axis: 'x' | 'y' | 'z', direction: 1 | -1) => void;
   rotation: number;
 }
@@ -105,8 +105,8 @@ export const Controls = ({ onRotate, onReposition, rotation }: ControlsProps) =>
     <Spacer size="xl" s={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
       <ControlPad
         onUp={() => onRotate('x', 'ccw')}
-        onLeft={() => onRotate('z', 'ccw')}
-        onRight={() => onRotate('z', 'cw')}
+        onLeft={() => onRotate('y', 'ccw')}
+        onRight={() => onRotate('y', 'cw')}
         onDown={() => onRotate('x', 'cw')}
         rotation={rotation}
       >

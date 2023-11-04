@@ -88,16 +88,16 @@ export const repositionShape = (shape: IShape, bottomBlocks: IBlock[], axis: 'x'
 
 type TAxis = 'x' | 'y' | 'z';
 
-export const rotateShape = (shape: IShape, blocks: IBlock[], axis: 'z' | 'x', direction: 'cw' | 'ccw') => {
+export const rotateShape = (shape: IShape, blocks: IBlock[], axis: 'x' | 'y', direction: 'cw' | 'ccw') => {
   let newShape = { ...shape };
 
   const dirAxises = pull(['x', 'y', 'z'], axis) as ['x' | 'y'] | ['z' | 'y'];
   const maxSize = (max(dirAxises.map((key) => shape.size[key])) as number) - 1;
-  const oppositeAxis = axis === 'z' ? 'x' : 'z';
+  const oppositeAxis = axis === 'x' ? 'y' : 'x';
 
   const orders: { cw: [TAxis, number][], ccw: [TAxis, number][] } = {
-    cw: [[oppositeAxis, 0], ['y', maxSize], [oppositeAxis, maxSize], ['y', 0]],
-    ccw: [['y', 0], [oppositeAxis, maxSize], ['y', maxSize], [oppositeAxis, 0]],
+    cw: [[oppositeAxis, 0], ['z', maxSize], [oppositeAxis, maxSize], ['z', 0]],
+    ccw: [['z', 0], [oppositeAxis, maxSize], ['z', maxSize], [oppositeAxis, 0]],
   };
 
   const axisChecks = dirAxises.map((dirAxis) => [[dirAxis, 0], [dirAxis, maxSize]]).flat() as [TAxis, number][];
@@ -109,9 +109,9 @@ export const rotateShape = (shape: IShape, blocks: IBlock[], axis: 'z' | 'x', di
       });
 
     // TODO: figure out why this works
-    if (axis === 'z' && direction === 'ccw' || axis === 'x' && direction === 'cw') {
-      axisCheckMatches.reverse();
-    }
+    // // if (axis === 'y' && direction === 'cw') {
+    //   axisCheckMatches.reverse();
+    // }
 
     const currentSideIndex = findIndex(orders[direction], (value) => isEqual(value, axisCheckMatches[0]));
     const currentSide = orders[direction][currentSideIndex];
@@ -156,6 +156,13 @@ export const rotateShape = (shape: IShape, blocks: IBlock[], axis: 'z' | 'x', di
       x: newShape.pos.x - (fix?.side?.x || 0),
       z: newShape.pos.z - (fix?.side?.z || 0),
       y: newShape.pos.y
+    }
+  }
+
+  if (shape.pos.x !== newShape.pos.x) {
+    newShape.pos = {
+      ...newShape.pos,
+      x: newShape.pos.x + shape.pos.x - newShape.pos.x,
     }
   }
 
