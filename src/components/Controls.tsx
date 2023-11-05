@@ -33,8 +33,6 @@ const SControlPadButton = s.button(({ direction }: { direction: string }) => ({
 
   svg: {
     stroke: 'secondaryDark',
-    width: '32px',
-    height: '32px'
   },
 
   ...(direction === 'up' && {
@@ -82,16 +80,16 @@ const ControlPad = ({ children, onUp, onDown, onLeft, onRight, rotation }: any) 
   return (
     <SControlPad rotation={rotation}>
       <SControlPadButton direction="up" onClick={onUp}>
-        <ChevronUp/>
+        <ChevronUp size="2rem" />
       </SControlPadButton>
       <SControlPadButton direction="left" onClick={onLeft}>
-        <ChevronLeft/>
+        <ChevronLeft size="2rem" />
       </SControlPadButton>
       <SControlPadButton direction="right" onClick={onRight}>
-        <ChevronRight/>
+        <ChevronRight size="2rem" />
       </SControlPadButton>
       <SControlPadButton direction="down" onClick={onDown}>
-        <ChevronDown/>
+        <ChevronDown size="2rem" />
       </SControlPadButton>
       <SControlPadIcon>
         { children }
@@ -110,10 +108,10 @@ export const Controls = ({ onRotate, onReposition, rotation }: ControlsProps) =>
         onDown={() => onRotate('x', 'cw')}
         rotation={rotation}
       >
-        <RotateCw size={20}/>
+        <RotateCw size="1.25rem" />
       </ControlPad>
       <SControlPadButton onClick={() => onReposition('y', -1)}>
-        <ChevronsDown />
+        <ChevronsDown size="2rem" />
       </SControlPadButton>
       <ControlPad
         onUp={() => onReposition('z', -1)}
@@ -122,7 +120,7 @@ export const Controls = ({ onRotate, onReposition, rotation }: ControlsProps) =>
         onDown={() => onReposition('z', 1)}
         rotation={rotation}
       >
-        <Move size={20}/>
+        <Move size="1.25rem" />
       </ControlPad>
     </Spacer>
   )

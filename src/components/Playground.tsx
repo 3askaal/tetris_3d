@@ -33,11 +33,10 @@ export const Playground = ({ shape, bottomBlocks = [], onRotate }: { shape: ISha
           minDistance={4.25}
           maxDistance={4.25}
           autoRotate={false}
-          enableRotate={true}
           enableZoom={false}
           enablePan={false}
           onChange={onRotate}
-          target={[0.7, 1.4, 0.7]}
+          target={[0.7, 1.2, 0.7]}
           minPolarAngle={1.5}
           maxPolarAngle={1.5}
         />
