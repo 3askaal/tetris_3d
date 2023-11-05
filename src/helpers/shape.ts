@@ -145,6 +145,13 @@ export const rotateShape = (shape: IShape, blocks: IBlock[], axis: 'x' | 'y', di
     z: (maxBy(newShape.blocks, 'z')?.z || 0) + 1,
   };
 
+  // TODO: trying to add negative space to pos to simulate more realistic rotation
+  // newShape.pos = {
+  //   ...newShape.pos,
+  //   x: negativeSpace.x > 0 ? newShape.pos.x + newShape.size.x - 1 : newShape.pos.x,
+  //   z: negativeSpace.z > 0 ? newShape.pos.z + newShape.size.z - 1 : newShape.pos.z,
+  // }
+
   const { hitsBlock, hitsBottom, hitsSide, fix } = checkPos(newShape, blocks)
 
   if (hitsBlock || hitsBottom) {
@@ -163,6 +170,8 @@ export const rotateShape = (shape: IShape, blocks: IBlock[], axis: 'x' | 'y', di
     newShape.pos = {
       ...newShape.pos,
       x: newShape.pos.x + shape.pos.x - newShape.pos.x,
+      z: newShape.pos.z + shape.pos.z - newShape.pos.z,
+      y: newShape.pos.y + shape.pos.y - newShape.pos.y,
     }
   }
 
