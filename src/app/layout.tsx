@@ -34,7 +34,11 @@ export default function RootLayout({ children }: { children: React.ReactNode}) {
     <html lang="en">
       <body>
         <ThemeProvider
-          theme={deepmerge(DEFAULT_THEME, LOCAL_THEME)}
+          theme={deepmerge(
+            DEFAULT_THEME,
+            LOCAL_THEME,
+            { arrayMerge: (srcArray, overrideArray) => overrideArray }
+          )}
         >
           <DynamicWrapper>
             <GlobalStyle />
