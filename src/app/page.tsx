@@ -1,16 +1,12 @@
 "use client";
 
-import { useEffect, useState } from "react"
-import { Canvas, ThreeEvent, useThree } from "@react-three/fiber"
+import { useState } from "react"
 import { useDebouncedValue, useIntervalWhen, useKey } from "rooks";
+import { Canvas } from "@react-three/fiber"
 import { Box, Container } from "3oilerplate";
-import { times } from "lodash";
-import { Block, Shape } from "@/components";
-import { PLAYGROUND_SIZE } from "@/constants";
+import { Playground, Controls } from "@/components";
 import { getInitialShape, repositionShape, rotateShape } from "@/helpers/shape";
 import { IBlock, IShape } from "@/types";
-import { OrbitControls } from "@react-three/drei";
-import { Controls } from "@/components/Controls";
 
 const Page = () => {
   const [rotation, setRotation] = useDebouncedValue<number>(0, 1000);
@@ -124,53 +120,21 @@ const Page = () => {
   return (
     <>
       <Canvas>
-        <Playground shape={shape} bottomBlocks={bottomBlocks} onRotate={onRotatePlayground} />
+        <Playground
+          shape={shape}
+          bottomBlocks={bottomBlocks}
+          onRotate={onRotatePlayground}
+        />
       </Canvas>
       <Box posa w100p df jcc s={{ bottom: 0, overflow: 'hidden', pb: 'm' }}>
         <Container s={{ maxWidth: '400px' }}>
-          <Controls onRotate={onRotateShape} onReposition={onRepositionShape} rotation={rotation} />
+          <Controls
+            rotation={rotation}
+            onReposition={onRepositionShape}
+            onRotate={onRotateShape}
+          />
         </Container>
       </Box>
-    </>
-  )
-}
-
-const Playground = ({ shape, bottomBlocks = [], onRotate }: { shape: IShape, bottomBlocks: IBlock[], onRotate: (event: any) => void }) => {
-  const { camera } = useThree();
-
-  return (
-    <>
-      <ambientLight />
-      <group scale={0.2}>
-        <Shape {...shape} />
-
-        { bottomBlocks?.map((bottomBlock, i) => (
-          <Block key={`block-${i}`} {...bottomBlock} />
-        )) }
-
-        { times(PLAYGROUND_SIZE * PLAYGROUND_SIZE, (i) => {
-          const x = i % PLAYGROUND_SIZE;
-          const z = Math.floor(i / PLAYGROUND_SIZE);
-          const y = 0;
-
-          return (
-            <Block key={`bottom-${i}`} x={x} y={y} z={z} color={'#ffffff'} />
-          )
-        }) }
-
-        <OrbitControls
-          camera={camera}
-          minDistance={4.25}
-          maxDistance={4.25}
-          enableRotate={true}
-          enableZoom={false}
-          enablePan={false}
-          onChange={onRotate}
-          target={[0.7, 1.4, 0.7]}
-          minPolarAngle={1.5}
-          maxPolarAngle={1.5}
-        />
-      </group>
     </>
   )
 }

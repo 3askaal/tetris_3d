@@ -1,17 +1,13 @@
 "use client";
 
-import type { Metadata } from 'next'
+import { FC, PropsWithChildren } from 'react';
+import dynamic from 'next/dynamic';
+import { s, ThemeProvider, GlobalStyle, theme as DEFAULT_THEME } from '3oilerplate'
 import ReactGA from 'react-ga4'
-import { ThemeProvider, theme as DEFAULT_THEME } from '3oilerplate'
-import { Inter } from 'next/font/google'
+import deepmerge from 'deepmerge'
 import { LOCAL_THEME } from '../style/theme';
-import './globals.css';
 
 import 'reset-css/reset.css'
-import dynamic from 'next/dynamic';
-import { FC, PropsWithChildren } from 'react';
-
-const inter = Inter({ subsets: ['latin'] })
 
 ReactGA.initialize('G-NF6H1LMC3H', {
   testMode: process.env.NODE_ENV === 'development'
@@ -25,22 +21,26 @@ const DynamicWrapper = dynamic(() => Promise.resolve(NonSSRWrapper), {
   ssr: false
 })
 
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode
-}) {
+export const SApp = s.div(() => ({
+  fontFamily: 'base',
+  width: '100%',
+  height: '100%',
+  backgroundColor: 'black',
+  color: 'color'
+}))
+
+export default function RootLayout({ children }: { children: React.ReactNode}) {
   return (
     <html lang="en">
-      <body className={inter.className}>
+      <body>
         <ThemeProvider
-          theme={{
-            ...DEFAULT_THEME,
-            ...LOCAL_THEME
-          }}
+          theme={deepmerge(DEFAULT_THEME, LOCAL_THEME)}
         >
           <DynamicWrapper>
-            {children}
+            <GlobalStyle />
+            <SApp>
+              { children }
+            </SApp>
           </DynamicWrapper>
         </ThemeProvider>
       </body>
