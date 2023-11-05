@@ -4,8 +4,7 @@ import { FC, PropsWithChildren } from 'react';
 import dynamic from 'next/dynamic';
 import { s, ThemeProvider, GlobalStyle, theme as DEFAULT_THEME } from '3oilerplate'
 import ReactGA from 'react-ga4'
-import deepmerge from 'deepmerge'
-import { LOCAL_THEME } from '../style/theme';
+import { THEME } from '../style/theme';
 
 import 'reset-css/reset.css'
 
@@ -33,13 +32,7 @@ export default function RootLayout({ children }: { children: React.ReactNode}) {
   return (
     <html lang="en">
       <body>
-        <ThemeProvider
-          theme={deepmerge(
-            DEFAULT_THEME,
-            LOCAL_THEME,
-            { arrayMerge: (srcArray, overrideArray) => overrideArray }
-          )}
-        >
+        <ThemeProvider theme={THEME}>
           <DynamicWrapper>
             <GlobalStyle />
             <SApp>
