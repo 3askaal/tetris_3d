@@ -1,3 +1,5 @@
-export * from './Plane'
-export * from './Block'
+export * from './Playground'
+export * from './Controls'
 export * from './Shape'
+export * from './Block'
+export * from './Plane'
