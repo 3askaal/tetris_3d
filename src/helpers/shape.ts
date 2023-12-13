@@ -1,4 +1,4 @@
-import { findIndex, isEqual, max, maxBy, minBy, pull, sample } from "lodash";
+import { findIndex, groupBy, includes, isEqual, max, maxBy, minBy, pull, sample, sum } from "lodash";
 import randomColor from "randomcolor";
 import { PLAYGROUND_SIZE, PLAYGROUND_HEIGHT, SHAPES } from "@/constants";
 import { IBlock, IShape } from "@/types";
@@ -76,6 +76,23 @@ export const repositionShape = (shape: IShape, bottomBlocks: IBlock[], axis: 'x'
         color: shape.color
       }))
     ];
+
+    // TODO: Calculate score, make this function return it
+
+    const fullRows = Object.entries(groupBy(newBottomBlocks, 'y'))
+      .filter(([index, row]) => row.length === PLAYGROUND_SIZE * PLAYGROUND_SIZE)
+      .map(([index]) => Number(index));
+
+    if (fullRows.length) {
+      newBottomBlocks = newBottomBlocks
+        .filter(({ y }) => !includes(fullRows, y))
+        .map((block) => ({
+          ...block,
+          y: block.y - sum(
+            fullRows.map((rowY) => block.y > rowY ? 1 : 0)
+          )
+        }))
+    }
 
     newShape = getInitialShape()
   }

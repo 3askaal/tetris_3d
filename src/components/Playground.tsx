@@ -11,7 +11,7 @@ export const Playground = ({ shape, bottomBlocks = [], onRotate }: { shape: ISha
   return (
     <>
       <ambientLight />
-      <group scale={0.2}>
+      <group scale={0.22}>
         <Shape {...shape} />
 
         { bottomBlocks?.map((bottomBlock, i) => (
@@ -36,7 +36,7 @@ export const Playground = ({ shape, bottomBlocks = [], onRotate }: { shape: ISha
           enableZoom={false}
           enablePan={false}
           onChange={onRotate}
-          target={[0.7, 1.2, 0.7]}
+          target={[0.5, 1.5, 0.5]}
           minPolarAngle={1.5}
           maxPolarAngle={1.5}
         />
