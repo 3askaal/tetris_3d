@@ -105,19 +105,18 @@ export const repositionShape = (shape: IShape, bottomBlocks: IBlock[], axis: 'x'
 
 type TAxis = 'x' | 'y' | 'z';
 
-export const rotateShape = (shape: IShape, blocks: IBlock[], axis: 'x' | 'y', direction: 'cw' | 'ccw') => {
+export const rotateShape = (shape: IShape, blocks: IBlock[], axis: TAxis, direction: 'cw' | 'ccw') => {
   let newShape = { ...shape };
 
-  const dirAxises = pull(['x', 'y', 'z'], axis) as ['x' | 'y'] | ['z' | 'y'];
-  const maxSize = (max(dirAxises.map((key) => shape.size[key])) as number) - 1;
-  const oppositeAxis = axis === 'x' ? 'y' : 'x';
+  const blockDirAxises = pull(['x', 'y', 'z'], axis) as [TAxis, TAxis];
+  const maxSize = (max(blockDirAxises.map((key) => shape.size[key])) as number) - 1;
 
   const orders: { cw: [TAxis, number][], ccw: [TAxis, number][] } = {
-    cw: [[oppositeAxis, 0], ['z', maxSize], [oppositeAxis, maxSize], ['z', 0]],
-    ccw: [['z', 0], [oppositeAxis, maxSize], ['z', maxSize], [oppositeAxis, 0]],
+    cw: [[blockDirAxises[0], 0], [blockDirAxises[1], maxSize], [blockDirAxises[0], maxSize], [blockDirAxises[1], 0]],
+    ccw: [[blockDirAxises[1], 0], [blockDirAxises[0], maxSize], [blockDirAxises[1], maxSize], [blockDirAxises[0], 0]],
   };
 
-  const axisChecks = dirAxises.map((dirAxis) => [[dirAxis, 0], [dirAxis, maxSize]]).flat() as [TAxis, number][];
+  const axisChecks = blockDirAxises.map((blockDirAxis) => [[blockDirAxis, 0], [blockDirAxis, maxSize]]).flat() as [TAxis, number][];
 
   newShape.blocks = newShape.blocks.map((block) => {
     const axisCheckMatches = axisChecks.filter((axisCheck) => block[axisCheck[0]] === axisCheck[1]);
@@ -126,7 +125,7 @@ export const rotateShape = (shape: IShape, blocks: IBlock[], axis: 'x' | 'y', di
       return block;
     }
 
-    if (axis === 'x' && direction === 'ccw' || axis === 'y' && direction === 'ccw') {
+    if (axis === 'x' && direction === 'ccw' || axis === 'z' && direction === 'ccw' || axis === 'y' && direction === 'ccw') {
       axisCheckMatches.reverse();
     }
 
