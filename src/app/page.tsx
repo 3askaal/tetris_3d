@@ -25,7 +25,7 @@ const Page = () => {
     }
   }
 
-  const onRotateShape = (axis: 'x' | 'y', direction: 'cw' | 'ccw') => {
+  const onRotateShape = (axis: 'x' | 'y' | 'z', direction: 'cw' | 'ccw') => {
     const newShape = rotateShape(shape, bottomBlocks, axis, direction);
     if (!newShape) return;
 
@@ -39,74 +39,108 @@ const Page = () => {
     setRotation(newRotation);
   }
 
-  const controls = {
-    up: {
-      position: () => onRepositionShape('z', -1),
-      rotate: () => onRotateShape('x', 'cw'),
-    },
-    down: {
-      position: () => onRepositionShape('z', 1),
-      rotate: () => onRotateShape('x', 'ccw'),
-    },
-    left: {
-      position: () => onRepositionShape('x', -1),
-      rotate: () => onRotateShape('y', 'ccw'),
-    },
-    right: {
-      position: () => onRepositionShape('x', 1),
-      rotate: () => onRotateShape('y', 'cw'),
-    },
-  }
-
   const rotatedControls = () => {
     if (rotation < 45 && rotation > -45) {
-      return controls;
+      return {
+        up: {
+          pos: () => onRepositionShape('z', -1),
+          rot: () => onRotateShape('x', 'cw'),
+        },
+        down: {
+          pos: () => onRepositionShape('z', 1),
+          rot: () => onRotateShape('x', 'ccw'),
+        },
+        left: {
+          pos: () => onRepositionShape('x', -1),
+          rot: () => onRotateShape('y', 'ccw'),
+        },
+        right: {
+          pos: () => onRepositionShape('x', 1),
+          rot: () => onRotateShape('y', 'cw'),
+        },
+      };
     }
 
     if (rotation >= 45 && rotation < 135) {
       return {
-        up: controls.left,
-        down: controls.right,
-        left: controls.down,
-        right: controls.up
+        up: {
+          pos: () => onRepositionShape('x', -1),
+          rot: () => onRotateShape('y', 'cw'),
+        },
+        down: {
+          pos: () => onRepositionShape('x', 1),
+          rot: () => onRotateShape('y', 'ccw'),
+        },
+        left: {
+          pos: () => onRepositionShape('z', 1),
+          rot: () => onRotateShape('z', 'ccw'),
+        },
+        right: {
+          pos: () => onRepositionShape('z', -1),
+          rot: () => onRotateShape('z', 'cw'),
+        },
       }
     }
 
     if (rotation < -45 && rotation > -135) {
       return {
-        up: controls.right,
-        down: controls.left,
-        left: controls.up,
-        right: controls.down
+        up: {
+          pos: () => onRepositionShape('x', 1),
+          rot: () => onRotateShape('y', 'ccw'),
+        },
+        down: {
+          pos: () => onRepositionShape('x', -1),
+          rot: () => onRotateShape('y', 'cw'),
+        },
+        left: {
+          pos: () => onRepositionShape('z', -1),
+          rot: () => onRotateShape('z', 'ccw'),
+        },
+        right: {
+          pos: () => onRepositionShape('z', 1),
+          rot: () => onRotateShape('z', 'cw'),
+        },
       }
     }
 
     return {
-      up: controls.down,
-      down: controls.up,
-      left: controls.right,
-      right: controls.left
+      up: {
+        pos: () => onRepositionShape('x', -1),
+        rot: () => onRotateShape('y', 'ccw'),
+      },
+      down: {
+        pos: () => onRepositionShape('x', 1),
+        rot: () => onRotateShape('y', 'cw'),
+      },
+      left: {
+        pos: () => onRepositionShape('z', 1),
+        rot: () => onRotateShape('x', 'ccw'),
+      },
+      right: {
+        pos: () => onRepositionShape('z', -1),
+        rot: () => onRotateShape('x', 'cw'),
+      },
     }
   }
 
   useKey('ArrowUp', (params: KeyboardEvent) => {
-    if (params.shiftKey) rotatedControls().up.rotate();
-    else rotatedControls().up.position();
+    if (params.shiftKey) rotatedControls().up.rot();
+    else rotatedControls().up.pos();
   })
 
   useKey('ArrowDown', (params: KeyboardEvent) => {
-    if (params.shiftKey) rotatedControls().down.rotate();
-    else rotatedControls().down.position();
+    if (params.shiftKey) rotatedControls().down.rot();
+    else rotatedControls().down.pos();
   })
 
   useKey('ArrowLeft', (params: KeyboardEvent) => {
-    if (params.shiftKey) rotatedControls().left.rotate();
-    else rotatedControls().left.position();
+    if (params.shiftKey) rotatedControls().left.rot();
+    else rotatedControls().left.pos();
   })
 
   useKey('ArrowRight', (params: KeyboardEvent) => {
-    if (params.shiftKey) rotatedControls().right.rotate();
-    else rotatedControls().right.position();
+    if (params.shiftKey) rotatedControls().right.rot();
+    else rotatedControls().right.pos();
   })
 
   useKey('Space', () => {
@@ -130,8 +164,8 @@ const Page = () => {
         <Container s={{ maxWidth: '400px' }}>
           <Controls
             rotation={rotation}
+            rotatedControls={rotatedControls}
             onReposition={onRepositionShape}
-            onRotate={onRotateShape}
           />
         </Container>
       </Box>
